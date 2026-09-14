@@ -1,4 +1,4 @@
-# AquaCheck 🤿
+# AquaCheck
 
 <p align="center">
   <img src="docs/diseño/Logo.svg" alt="AquaCheck Logo" width="180" />
@@ -20,7 +20,7 @@
 
 ---
 
-## 📌 Índice
+## Índice
 1. [Descripción del Proyecto](#-descripción-del-proyecto)
 2. [Problemática y Propuesta de Valor](#-problemática-y-propuesta-de-valor)
 3. [Usuarios y Roles](#-usuarios-y-roles)
@@ -39,7 +39,7 @@
 
 ---
 
-## ⚠️ Problemática y Propuesta de Valor
+## Problemática y Propuesta de Valor
 
 ### El Problema
 En faenas acuícolas y de buceo comercial, el proceso tradicional de pre-chequeo depende de planillas físicas de papel y anotaciones manuales. Esto acarrea dificultades operativas críticas:
@@ -54,7 +54,7 @@ En faenas acuícolas y de buceo comercial, el proceso tradicional de pre-chequeo
 
 ---
 
-## 👥 Usuarios y Roles
+## Usuarios y Roles
 
 | Rol | ¿Qué necesita hacer? | Desafío actual que resuelve |
 | :--- | :--- | :--- |
@@ -63,7 +63,7 @@ En faenas acuícolas y de buceo comercial, el proceso tradicional de pre-chequeo
 
 ---
 
-## 🎯 Definición del MVP
+## Definición del MVP
 
 El Producto Mínimo Viable (MVP) se enfoca en resolver el núcleo del problema de seguridad y pre-inmersión:
 
@@ -84,9 +84,9 @@ En caso de máxima restricción de alcance, el núcleo inamovible de la solució
 4. Historial/panel de chequeos para trazabilidad.
 
 ### Fuera del Alcance en esta Etapa
-- ❌ Importación masiva de fichas médicas vía archivos externos (Excel, CSV, JSON).
-- ❌ Monitoreo telemétrico en tiempo real subacuático (profundidad continua, mezclas de gases mediante sensores IoT).
-- ❌ Integración directa con ERP o sistemas corporativos de recursos humanos externos.
+- Importación masiva de fichas médicas vía archivos externos (Excel, CSV, JSON).
+- Monitoreo telemétrico en tiempo real subacuático (profundidad continua, mezclas de gases mediante sensores IoT).
+- Integración directa con ERP o sistemas corporativos de recursos humanos externos.
 
 ### Requerimientos No Funcionales
 - **Rendimiento:** Tiempos de respuesta inferiores a 2 segundos en validaciones y cálculos.
@@ -95,7 +95,7 @@ En caso de máxima restricción de alcance, el núcleo inamovible de la solució
 
 ---
 
-## 🔄 Flujo de Usuario y Diagrama UML
+## Flujo de Usuario y Diagrama UML
 
 El recorrido del usuario sigue una secuencia estricta para garantizar que ningún chequeo omita pasos críticos de seguridad.
 
@@ -125,7 +125,7 @@ El diagrama de actividad formal que modela las bifurcaciones y actividades del s
 
 ---
 
-## 🎨 Identidad Visual y Sistema de Diseño
+## Identidad Visual y Sistema de Diseño
 
 El sistema visual de **AquaCheck** fue concebido siguiendo las directrices de **Material Design 3**, buscando transmitir seguridad, tranquilidad y alta legibilidad bajo luz natural o condiciones adversas.
 
@@ -145,7 +145,7 @@ El isotipo fusiona un **visor submarino** con un **check de confirmación**, sim
 
 ---
 
-## 📱 Interfaces de la Aplicación
+## Interfaces de la Aplicación
 
 Las pantallas fueron diseñadas y prototipadas en **Figma** y estructuradas para su implementación en **Jetpack Compose**.
 
@@ -197,15 +197,15 @@ Las pantallas fueron diseñadas y prototipadas en **Figma** y estructuradas para
 
 ---
 
-## 📁 Evidencias y Documentación
+## Evidencias y Documentación
 
 Toda la documentación técnica y actas académicas del proyecto se encuentran centralizadas en el repositorio:
 
-- 📄 **Clase 01 - Del Problema del Cliente al MVP:**  
+-  **Clase 01 - Del Problema del Cliente al MVP:**  
   [`docs/Evidencias/Evidencia_Clase_01_MVP_EquipoSixSeven.docx`](docs/Evidencias/Evidencia_Clase_01_MVP_EquipoSixSeven.docx)  
   *Contiene el análisis de problemática, identificación de usuarios, matriz de requerimientos y delimitación del MVP.*
 
-- 📄 **Clase 02 - Flujo de Usuario y Diseño de Interfaces:**  
+-  **Clase 02 - Flujo de Usuario y Diseño de Interfaces:**  
   [`docs/Evidencias/Evidencia_Clase_02_Diseno_EquipoSixSeven.docx`](docs/Evidencias/Evidencia_Clase_02_Diseno_EquipoSixSeven.docx)  
   *Contiene la definición de identidad visual, especificación de paleta Material 3, diagrama UML y catalogación de pantallas Figma.*
 
@@ -235,7 +235,7 @@ AquaCheck/
 
 ---
 
-## 👥 Equipo de Desarrollo
+##  Equipo de Desarrollo
 
 **Equipo: SixSeven (Sección 002D)**
 
