@@ -33,7 +33,7 @@
 
 ---
 
-## 📖 Descripción del Proyecto
+## Descripción del Proyecto
 
 **AquaCheck** es una solución móvil nativa para Android diseñada para apoyar y modernizar las operaciones de buceo profesional y acuícola. La aplicación transforma las listas de chequeo analógicas en un sistema digital ágil, permitiendo a supervisores y buzos registrar antecedentes médicos, evaluar el equipamiento técnico mediante estándares normativos (**DPR 24** y **AST**), capturar evidencia fotográfica geolocalizada en terreno y obtener un dictamen preliminar automático sobre la aptitud del buzo antes de iniciar la faena marina.
 
