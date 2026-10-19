@@ -1,0 +1,242 @@
+package com.example.aquacheck.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.aquacheck.model.EstadoItem
+import com.example.aquacheck.model.ItemChecklist
+import com.example.aquacheck.model.MockData
+import com.example.aquacheck.ui.components.AppCard
+import com.example.aquacheck.ui.components.AppTopAppBar
+import com.example.aquacheck.ui.components.PrimaryButton
+import com.example.aquacheck.ui.theme.AptoContainerGreen
+import com.example.aquacheck.ui.theme.AquaCheckTheme
+import com.example.aquacheck.ui.theme.BackgroundLight
+import com.example.aquacheck.ui.theme.OnAptoContainerGreen
+import com.example.aquacheck.ui.theme.ObservadoContainerRed
+import com.example.aquacheck.ui.theme.ObservadoRed
+import com.example.aquacheck.ui.theme.PrimaryDarkGreen
+import com.example.aquacheck.viewmodel.PreChequeoUiState
+import com.example.aquacheck.viewmodel.PreChequeoViewModel
+
+@Composable
+fun ChecklistScreen(
+    viewModel: PreChequeoViewModel,
+    checklistId: String,
+    onBackClick: () -> Unit,
+    onNavigateToEvidencias: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ChecklistContent(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onItemEstadoChange = { itemId, estado ->
+            viewModel.updateItemEstado(itemId, estado)
+        },
+        onSiguienteClick = {
+            viewModel.calcularResultado()
+            onNavigateToEvidencias()
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ChecklistContent(
+    uiState: PreChequeoUiState,
+    onBackClick: () -> Unit,
+    onItemEstadoChange: (String, EstadoItem) -> Unit,
+    onSiguienteClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            AppTopAppBar(
+                title = "Evaluación de Seguridad",
+                onBackClick = onBackClick
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(BackgroundLight)
+        ) {
+            // Header Info Card
+            AppCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Buzo: ${uiState.currentBuzo?.nombre ?: "Sin asignar"}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryDarkGreen
+                )
+                Text(
+                    text = "Centro: ${uiState.currentCentro?.nombre ?: "Sin asignar"} | Fecha: ${uiState.currentDate}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // LazyColumn of items
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(uiState.checklistItems, key = { it.id }) { item ->
+                    ChecklistItemCard(
+                        item = item,
+                        onEstadoSelected = { nuevoEstado ->
+                            onItemEstadoChange(item.id, nuevoEstado)
+                        }
+                    )
+                }
+            }
+
+            // Bottom Navigation Button
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                PrimaryButton(
+                    text = "Siguiente",
+                    icon = Icons.AutoMirrored.Rounded.ArrowForward,
+                    onClick = onSiguienteClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChecklistItemCard(
+    item: ItemChecklist,
+    onEstadoSelected: (EstadoItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = item.nombre,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Option 1: Cumple
+            val isCumple = item.estado == EstadoItem.CUMPLE
+            FilterChip(
+                selected = isCumple,
+                onClick = { onEstadoSelected(EstadoItem.CUMPLE) },
+                label = {
+                    Text(
+                        text = "Cumple",
+                        fontWeight = if (isCumple) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = AptoContainerGreen,
+                    selectedLabelColor = OnAptoContainerGreen
+                ),
+                modifier = Modifier.weight(1f)
+            )
+
+            // Option 2: Observado
+            val isObservado = item.estado == EstadoItem.OBSERVADO
+            FilterChip(
+                selected = isObservado,
+                onClick = { onEstadoSelected(EstadoItem.OBSERVADO) },
+                label = {
+                    Text(
+                        text = "Observado",
+                        fontWeight = if (isObservado) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = ObservadoContainerRed,
+                    selectedLabelColor = ObservadoRed
+                ),
+                modifier = Modifier.weight(1f)
+            )
+
+            // Option 3: No Cumple
+            val isNoCumple = item.estado == EstadoItem.NO_CUMPLE
+            FilterChip(
+                selected = isNoCumple,
+                onClick = { onEstadoSelected(EstadoItem.NO_CUMPLE) },
+                label = {
+                    Text(
+                        text = "No Cumple",
+                        fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = ObservadoContainerRed,
+                    selectedLabelColor = ObservadoRed
+                ),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChecklistScreenPreview() {
+    AquaCheckTheme {
+        ChecklistContent(
+            uiState = PreChequeoUiState(
+                currentBuzo = MockData.mockBuzos[0],
+                currentCentro = MockData.mockCentros[0],
+                currentDate = "2026-10-05",
+                checklistItems = MockData.defaultChecklistItems
+            ),
+            onBackClick = {},
+            onItemEstadoChange = { _, _ -> },
+            onSiguienteClick = {}
+        )
+    }
+}
