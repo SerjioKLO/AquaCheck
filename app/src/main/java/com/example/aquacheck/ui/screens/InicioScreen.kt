@@ -23,12 +23,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Sync
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -106,6 +109,7 @@ fun InicioContent(
     val coroutineScope = rememberCoroutineScope()
     var isSyncing by remember { mutableStateOf(false) }
     var syncProgress by remember { mutableFloatStateOf(0f) }
+    var filterMenuExpanded by remember { mutableStateOf(false) }
 
     val navigationTabs = listOf(
         NavigationTab("Historial", Icons.Rounded.History),
@@ -252,7 +256,7 @@ fun InicioContent(
                             OutlinedTextField(
                                 value = uiState.searchQuery,
                                 onValueChange = onSearchQueryChange,
-                                label = { Text("Buscar por buzo, centro o fecha...") },
+                                label = { Text("Buscar") },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Rounded.Search,
@@ -260,26 +264,35 @@ fun InicioContent(
                                         tint = PrimaryDarkGreen
                                     )
                                 },
+                                trailingIcon = {
+                                    Box {
+                                        IconButton(onClick = { filterMenuExpanded = true }) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.FilterList,
+                                                contentDescription = "Filtrar por estado",
+                                                tint = PrimaryDarkGreen
+                                            )
+                                        }
+                                        DropdownMenu(
+                                            expanded = filterMenuExpanded,
+                                            onDismissRequest = { filterMenuExpanded = false }
+                                        ) {
+                                            listOf("Todos", "Apto", "Observado").forEach { filter ->
+                                                DropdownMenuItem(
+                                                    text = { Text(text = "$filter") },
+                                                    onClick = {
+                                                        onFilterSelected(filter)
+                                                        filterMenuExpanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
                             )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                listOf("Todos", "Apto", "Observado").forEach { filter ->
-                                    val isSelected = uiState.selectedFilter == filter
-                                    FilterChip(
-                                        selected = isSelected,
-                                        onClick = { onFilterSelected(filter) },
-                                        label = { Text(filter) },
-                                        shape = RoundedCornerShape(20.dp),
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                            }
                         }
 
                         HistorialTab(
