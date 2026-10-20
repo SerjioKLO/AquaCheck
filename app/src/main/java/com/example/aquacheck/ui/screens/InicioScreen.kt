@@ -39,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -55,7 +56,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.material3.TextButton
 import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
 import com.example.aquacheck.model.RolUsuario
@@ -78,6 +78,7 @@ import kotlinx.coroutines.launch
 fun InicioScreen(
     viewModel: PreChequeoViewModel,
     onNewPreChequeoClick: () -> Unit,
+    onNavigateToPerfil: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -87,6 +88,7 @@ fun InicioScreen(
         onSearchQueryChange = { viewModel.setSearchQuery(it) },
         onFilterSelected = { viewModel.setSelectedFilter(it) },
         onNewPreChequeoClick = onNewPreChequeoClick,
+        onNavigateToPerfil = onNavigateToPerfil,
         onLogoutClick = {
             viewModel.logout()
             onLogoutClick()
@@ -101,6 +103,7 @@ fun InicioContent(
     onSearchQueryChange: (String) -> Unit,
     onFilterSelected: (String) -> Unit,
     onNewPreChequeoClick: () -> Unit,
+    onNavigateToPerfil: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -213,6 +216,8 @@ fun InicioContent(
                     onTabSelected = { index ->
                         if (index == 1) {
                             startSyncProcess()
+                        } else if (index == 2) {
+                            onNavigateToPerfil()
                         } else {
                             selectedTab = index
                         }
@@ -301,7 +306,6 @@ fun InicioContent(
                         )
                     }
                 }
-                2 -> PerfilTab(uiState = uiState)
             }
 
             SnackbarHost(
@@ -384,37 +388,6 @@ private fun PreChequeoCard(
     }
 }
 
-@Composable
-private fun PerfilTab(uiState: PreChequeoUiState) {
-    val user = uiState.currentUser
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        AppCard(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Perfil de Usuario",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = PrimaryDarkGreen
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = user?.nombre ?: "Sin Usuario",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = "Rol: ${user?.rol?.name ?: "Sin Rol"}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun InicioScreenPreview() {
@@ -424,6 +397,7 @@ fun InicioScreenPreview() {
             onSearchQueryChange = {},
             onFilterSelected = {},
             onNewPreChequeoClick = {},
+            onNavigateToPerfil = {},
             onLogoutClick = {}
         )
     }

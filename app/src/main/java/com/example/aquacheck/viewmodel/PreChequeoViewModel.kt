@@ -85,7 +85,12 @@ class PreChequeoViewModel(application: Application? = null) : ViewModel() {
         }
 
         return if (userObj != null) {
-            _uiState.update { it.copy(currentUser = userObj) }
+            _uiState.update {
+                it.copy(
+                    currentUser = userObj,
+                    profileNombre = userObj.nombre
+                )
+            }
             true
         } else {
             false
@@ -149,6 +154,22 @@ class PreChequeoViewModel(application: Application? = null) : ViewModel() {
 
     fun setSelectedFilter(filter: String) {
         _uiState.update { it.copy(selectedFilter = filter) }
+    }
+
+    fun updateProfile(nombre: String, rut: String, telefono: String) {
+        _uiState.update {
+            it.copy(
+                profileNombre = nombre,
+                profileRut = rut,
+                profileTelefono = telefono
+            )
+        }
+    }
+
+    fun updateProfileImageUri(uri: String?) {
+        _uiState.update {
+            it.copy(profileImageUri = uri)
+        }
     }
 
     fun setCentro(centro: Centro?) {

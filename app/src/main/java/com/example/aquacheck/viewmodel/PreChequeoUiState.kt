@@ -32,5 +32,9 @@ data class PreChequeoUiState(
     val observacionesText: String = "",
     val evidenciasUris: List<String> = emptyList(),
     val searchQuery: String = "",
-    val selectedFilter: String = "Todos"
+    val selectedFilter: String = "Todos",
+    val profileNombre: String = "Matías Rojas Silva",
+    val profileRut: String = "16.482.739-5",
+    val profileTelefono: String = "+56 9 6123 4587",
+    val profileImageUri: String? = null
 )
