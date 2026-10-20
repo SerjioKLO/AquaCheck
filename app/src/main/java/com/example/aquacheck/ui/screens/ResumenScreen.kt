@@ -59,6 +59,7 @@ import com.example.aquacheck.ui.theme.OnAptoContainerGreen
 import com.example.aquacheck.ui.theme.OnBackgroundText
 import com.example.aquacheck.ui.theme.ObservadoContainerRed
 import com.example.aquacheck.ui.theme.ObservadoRed
+import com.example.aquacheck.ui.theme.OutlineBorder
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
 import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
@@ -145,7 +146,7 @@ fun ResumenContent(
                     Text(
                         text = "Evaluación: ${resultado.resumenChecklist}",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         color = headerTextColor
                     )
                 }
@@ -177,7 +178,7 @@ fun ResumenContent(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(color = OutlineBorder)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
@@ -200,7 +201,8 @@ fun ResumenContent(
                         Text(
                             text = item.nombre,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
                         )
                         val statusString = when (item.estado) {
@@ -242,7 +244,8 @@ fun ResumenContent(
                     Text(
                         text = "No se adjuntaron evidencias fotográficas.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 } else {
                     LazyRow(
@@ -331,12 +334,14 @@ private fun DetailItem(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

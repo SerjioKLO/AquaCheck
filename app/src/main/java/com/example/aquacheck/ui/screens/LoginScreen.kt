@@ -85,7 +85,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            //AQUACHECK bajo el logo
+            // AQUACHECK bajo el logo
             Text(
                 text = "AquaCheck",
                 style = TextStyle(
@@ -107,7 +107,7 @@ fun LoginScreen(
                     usuario = it
                     errorMessage = null
                 },
-                label = { Text("Usuario (supervisor / jefe)") },
+                label = { Text("Usuario (supervisor / jefe)", color = Color(0xFF12260E)) },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Person,
@@ -119,8 +119,12 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF12260E),
+                    unfocusedTextColor = Color(0xFF12260E),
                     focusedBorderColor = Color(0xFF12260E),
-                    focusedLabelColor = Color(0xFF12260E)
+                    unfocusedBorderColor = Color(0xFF12260E),
+                    focusedLabelColor = Color(0xFF12260E),
+                    unfocusedLabelColor = Color(0xFF12260E)
                 )
             )
 
@@ -133,7 +137,7 @@ fun LoginScreen(
                     contrasena = it
                     errorMessage = null
                 },
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña", color = Color(0xFF12260E)) },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
@@ -149,8 +153,12 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF12260E),
+                    unfocusedTextColor = Color(0xFF12260E),
                     focusedBorderColor = Color(0xFF12260E),
-                    focusedLabelColor = Color(0xFF12260E)
+                    unfocusedBorderColor = Color(0xFF12260E),
+                    focusedLabelColor = Color(0xFF12260E),
+                    unfocusedLabelColor = Color(0xFF12260E)
                 )
             )
 
@@ -199,12 +207,13 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sub-titulo hasta abajo de la pantalla
+            // Sub-titulo hasta abajo de la pantalla con alto contraste
             Text(
                 text = "Seguridad industrial · Operación sin conexión",
                 style = TextStyle(
-                    color = Color(0xFF555555),
-                    fontSize = 12.sp
+                    color = Color(0xFF12260E),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold
                 ),
                 textAlign = TextAlign.Center
             )

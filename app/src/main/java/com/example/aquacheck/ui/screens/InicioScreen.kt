@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -227,7 +228,6 @@ fun InicioContent(
             }
         },
         floatingActionButton = {
-            // Solo el supervisor ve el botón "Nuevo pre-chequeo"
             if (selectedTab == 0 && isSupervisor) {
                 FloatingActionButton(
                     onClick = onNewPreChequeoClick,
@@ -261,7 +261,7 @@ fun InicioContent(
                             OutlinedTextField(
                                 value = uiState.searchQuery,
                                 onValueChange = onSearchQueryChange,
-                                label = { Text("Buscar") },
+                                label = { Text("Buscar", color = MaterialTheme.colorScheme.onSurface) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Rounded.Search,
@@ -284,7 +284,7 @@ fun InicioContent(
                                         ) {
                                             listOf("Todos", "Apto", "Observado").forEach { filter ->
                                                 DropdownMenuItem(
-                                                    text = { Text(text = "$filter") },
+                                                    text = { Text(text = "$filter", color = MaterialTheme.colorScheme.onSurface) },
                                                     onClick = {
                                                         onFilterSelected(filter)
                                                         filterMenuExpanded = false
@@ -296,7 +296,15 @@ fun InicioContent(
                                 },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    focusedBorderColor = PrimaryDarkGreen,
+                                    unfocusedBorderColor = PrimaryDarkGreen,
+                                    focusedLabelColor = PrimaryDarkGreen,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                                )
                             )
                         }
 
@@ -331,7 +339,8 @@ private fun HistorialTab(
             Text(
                 text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     } else {
@@ -374,16 +383,20 @@ private fun PreChequeoCard(
         Text(
             text = "Buzo: ${preChequeo.buzo.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = "Supervisor: ${preChequeo.supervisor.nombre}",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = "Centro: ${preChequeo.centro.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

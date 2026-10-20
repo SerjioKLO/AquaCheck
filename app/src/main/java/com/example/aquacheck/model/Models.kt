@@ -66,7 +66,16 @@ data class PreChequeo(
     val resultado: String = "Apto",
     val observaciones: String = "",
     val salud: DatosSalud? = null,
-    val nivelSalud: NivelSalud? = null
+    val nivelSalud: NivelSalud? = null,
+    val frecuenciaCardiaca: Int = 0,
+    val sistolica: Int = 0,
+    val diastolica: Int = 0,
+    val saturacion: Int = 0,
+    val horasSueno: Int = 0,
+    val horasUltimoAlcohol: Int = 0,
+    val tieneCongestionNasal: Boolean = false,
+    val tomaMedicamentosNuevos: Boolean = false,
+    val estadoPsicologicoCalmo: Boolean = true
 )
 
 data class Resultado(
@@ -75,13 +84,22 @@ data class Resultado(
     val resumenChecklist: String
 )
 
-enum class NivelSalud{
+enum class NivelSalud {
     NORMAL,
     ATENCION,
     CRITICA
 }
 
 data class DatosSalud(
+    val frecuenciaCardiaca: Int = 0,
+    val sistolica: Int = 0,
+    val diastolica: Int = 0,
+    val saturacion: Int = 0,
+    val horasSueno: Int = 0,
+    val horasUltimoAlcohol: Int = 0,
+    val tieneCongestionNasal: Boolean = false,
+    val tomaMedicamentosNuevos: Boolean = false,
+    val estadoPsicologicoCalmo: Boolean = true,
     val presionsistolica: Int? = null,
     val presionDiastolica: Int? = null,
     val saturacionOxigeno: Int? = null,
@@ -89,5 +107,3 @@ data class DatosSalud(
     val resfrioDolorOidos: Boolean = false,
     val consumioAlcohol24hrs: Boolean = false
 )
-
-

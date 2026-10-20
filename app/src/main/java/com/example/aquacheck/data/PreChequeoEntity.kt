@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
+import com.example.aquacheck.model.DatosSalud
 import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
 import com.example.aquacheck.model.Supervisor
@@ -22,7 +23,16 @@ data class PreChequeoEntity(
     val centroUbicacion: String,
     val fecha: String,
     val resultado: String,
-    val observaciones: String
+    val observaciones: String,
+    val frecuenciaCardiaca: Int = 0,
+    val sistolica: Int = 0,
+    val diastolica: Int = 0,
+    val saturacion: Int = 0,
+    val horasSueno: Int = 0,
+    val horasUltimoAlcohol: Int = 0,
+    val tieneCongestionNasal: Boolean = false,
+    val tomaMedicamentosNuevos: Boolean = false,
+    val estadoPsicologicoCalmo: Boolean = true
 ) {
     fun toDomain(): PreChequeo {
         return PreChequeo(
@@ -34,7 +44,30 @@ data class PreChequeoEntity(
             items = MockData.defaultChecklistItems,
             evidencias = emptyList(),
             resultado = resultado,
-            observaciones = observaciones
+            observaciones = observaciones,
+            frecuenciaCardiaca = frecuenciaCardiaca,
+            sistolica = sistolica,
+            diastolica = diastolica,
+            saturacion = saturacion,
+            horasSueno = horasSueno,
+            horasUltimoAlcohol = horasUltimoAlcohol,
+            tieneCongestionNasal = tieneCongestionNasal,
+            tomaMedicamentosNuevos = tomaMedicamentosNuevos,
+            estadoPsicologicoCalmo = estadoPsicologicoCalmo,
+            salud = DatosSalud(
+                frecuenciaCardiaca = frecuenciaCardiaca,
+                sistolica = sistolica,
+                diastolica = diastolica,
+                saturacion = saturacion,
+                horasSueno = horasSueno,
+                horasUltimoAlcohol = horasUltimoAlcohol,
+                tieneCongestionNasal = tieneCongestionNasal,
+                tomaMedicamentosNuevos = tomaMedicamentosNuevos,
+                estadoPsicologicoCalmo = estadoPsicologicoCalmo,
+                presionsistolica = sistolica,
+                presionDiastolica = diastolica,
+                saturacionOxigeno = saturacion
+            )
         )
     }
 
@@ -52,7 +85,16 @@ data class PreChequeoEntity(
                 centroUbicacion = preChequeo.centro.ubicacion,
                 fecha = preChequeo.fecha,
                 resultado = preChequeo.resultado,
-                observaciones = preChequeo.observaciones
+                observaciones = preChequeo.observaciones,
+                frecuenciaCardiaca = preChequeo.frecuenciaCardiaca,
+                sistolica = preChequeo.sistolica,
+                diastolica = preChequeo.diastolica,
+                saturacion = preChequeo.saturacion,
+                horasSueno = preChequeo.horasSueno,
+                horasUltimoAlcohol = preChequeo.horasUltimoAlcohol,
+                tieneCongestionNasal = preChequeo.tieneCongestionNasal,
+                tomaMedicamentosNuevos = preChequeo.tomaMedicamentosNuevos,
+                estadoPsicologicoCalmo = preChequeo.estadoPsicologicoCalmo
             )
         }
     }

@@ -11,6 +11,9 @@ interface PreChequeoDao {
     @Query("SELECT * FROM prechequeos ORDER BY fecha DESC")
     fun getAllPreChequeos(): Flow<List<PreChequeoEntity>>
 
+    @Query("SELECT * FROM prechequeos WHERE id = :id")
+    suspend fun getPreChequeoById(id: String): PreChequeoEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPreChequeo(entity: PreChequeoEntity)
 

@@ -21,8 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -59,6 +59,7 @@ import com.example.aquacheck.ui.components.AppTopAppBar
 import com.example.aquacheck.ui.theme.AquaCheckTheme
 import com.example.aquacheck.ui.theme.BackgroundLight
 import com.example.aquacheck.ui.theme.OnBackgroundText
+import com.example.aquacheck.ui.theme.OutlineBorder
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
 import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
@@ -213,13 +214,13 @@ fun PerfilContent(
                             label = "Nombre y apellido",
                             value = uiState.profileNombre
                         )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        HorizontalDivider(color = OutlineBorder)
                         ProfileInfoRow(
                             icon = Icons.Outlined.Badge,
                             label = "RUT",
                             value = uiState.profileRut
                         )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        HorizontalDivider(color = OutlineBorder)
                         ProfileInfoRow(
                             icon = Icons.Outlined.Phone,
                             label = "Número de teléfono",
@@ -256,7 +257,8 @@ fun PerfilContent(
                 Text(
                     text = "Seguridad industrial · Operación sin conexión",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
@@ -385,12 +387,13 @@ private fun ProfileInfoRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
                 color = OnBackgroundText
             )
         }

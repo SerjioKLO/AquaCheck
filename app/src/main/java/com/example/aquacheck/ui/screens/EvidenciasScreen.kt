@@ -197,7 +197,8 @@ fun EvidenciasContent(
             Text(
                 text = "Registra el estado del equipo y el área de trabajo.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = OnBackgroundText,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -221,7 +222,8 @@ fun EvidenciasContent(
                         Text(
                             text = "No hay evidencias fotográficas registradas.\nPresiona \"Capturar\" para abrir la cámara del teléfono y tomar una foto.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -253,9 +255,9 @@ fun EvidenciasContent(
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = Color.Transparent,
-                    contentColor = OnBackgroundText
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 ),
-                border = BorderStroke(1.dp, OutlineBorder.copy(alpha = 0.5f))
+                border = BorderStroke(1.5.dp, OutlineBorder)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.CameraAlt,
@@ -296,7 +298,8 @@ fun EvidenciasContent(
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
                         text = "Selecciona o escribe el nombre del equipo o área fotografiada:",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // Preset tags row 1
@@ -318,7 +321,8 @@ fun EvidenciasContent(
                                     text = cat,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -343,7 +347,8 @@ fun EvidenciasContent(
                                     text = cat,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -482,7 +487,7 @@ fun EvidenciaCardItem(
                 Text(
                     text = evidencia.titulo,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Bold,
                     color = OnBackgroundText,
                     textAlign = TextAlign.Center
                 )

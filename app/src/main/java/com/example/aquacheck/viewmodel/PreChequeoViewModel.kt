@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aquacheck.data.AppDatabase
-import com.example.aquacheck.data.PreChequeoDao
-import com.example.aquacheck.data.PreChequeoEntity
+import com.example.aquacheck.data.PreChequeoRepository
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
 import com.example.aquacheck.model.EstadoItem
@@ -27,7 +26,7 @@ import java.util.UUID
 
 class PreChequeoViewModel : ViewModel() {
 
-    private var preChequeoDao: PreChequeoDao? = null
+    private var repository: PreChequeoRepository? = null
 
     private val _uiState = MutableStateFlow(
         PreChequeoUiState(
@@ -46,19 +45,20 @@ class PreChequeoViewModel : ViewModel() {
     val uiState: StateFlow<PreChequeoUiState> = _uiState.asStateFlow()
 
     fun initDatabase(context: Context) {
-        if (preChequeoDao != null) return
+        if (repository != null) return
         try {
             val dao = AppDatabase.getDatabase(context).preChequeoDao()
-            preChequeoDao = dao
+            val repo = PreChequeoRepository(dao)
+            repository = repo
             viewModelScope.launch {
-                dao.getAllPreChequeos().collectLatest { entities ->
-                    val preChequeosList = if (entities.isEmpty()) {
+                repo.getAllPreChequeos().collectLatest { list ->
+                    val preChequeosList = if (list.isEmpty()) {
                         MockData.mockPreChequeos.forEach { mock ->
-                            dao.insertPreChequeo(PreChequeoEntity.fromDomain(mock))
+                            repo.insertPreChequeo(mock)
                         }
                         MockData.mockPreChequeos
                     } else {
-                        entities.map { it.toDomain() }
+                        list
                     }
                     _uiState.update { it.copy(preChequeos = preChequeosList) }
                 }
@@ -236,10 +236,10 @@ class PreChequeoViewModel : ViewModel() {
             resultado = resultadoCalculado.estado
         )
 
-        val dao = preChequeoDao
-        if (dao != null) {
+        val repo = repository
+        if (repo != null) {
             viewModelScope.launch {
-                dao.insertPreChequeo(PreChequeoEntity.fromDomain(nuevoPreChequeo))
+                repo.insertPreChequeo(nuevoPreChequeo)
             }
         } else {
             _uiState.update { state ->

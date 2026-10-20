@@ -26,7 +26,7 @@ fun AppCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     containerColor: Color = SurfaceLight,
-    border: BorderStroke? = BorderStroke(1.5.dp, OutlineBorder.copy(alpha = 0.3f)),
+    border: BorderStroke? = BorderStroke(1.5.dp, OutlineBorder),
     content: @Composable ColumnScope.() -> Unit
 ) {
     if (onClick != null) {
@@ -72,11 +72,13 @@ fun AppCardPreview() {
         ) {
             Text(
                 text = "Tarjeta AquaCheck",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = "Información de inspección con alto contraste outdoor.",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

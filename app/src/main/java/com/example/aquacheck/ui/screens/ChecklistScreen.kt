@@ -178,7 +178,7 @@ private fun ChecklistItemCard(
                     ) {
                         Text(
                             text = "Cumple",
-                            fontSize = 13.sp,
+                            fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
                             fontWeight = if (isCumple) FontWeight.Bold else FontWeight.Normal
@@ -205,7 +205,7 @@ private fun ChecklistItemCard(
                     ) {
                         Text(
                             text = "Observado",
-                            fontSize = 13.sp,
+                            fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
                             fontWeight = if (isObservado) FontWeight.Bold else FontWeight.Normal
@@ -232,7 +232,7 @@ private fun ChecklistItemCard(
                     ) {
                         Text(
                             text = "No Cumple",
-                            fontSize = 13.sp,
+                            fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
                             fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.Normal

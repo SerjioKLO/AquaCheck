@@ -122,7 +122,8 @@ fun PreChequeoContent(
                 Text(
                     text = "Seleccione los datos para iniciar la verificación pre-inmersión.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -146,7 +147,7 @@ fun PreChequeoContent(
                     fechaText = it
                     errorMessage = null
                 },
-                label = { Text("Fecha de Inspección") },
+                label = { Text("Fecha de Inspección", color = MaterialTheme.colorScheme.onSurface) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.CalendarToday,
@@ -158,8 +159,12 @@ fun PreChequeoContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     focusedBorderColor = PrimaryDarkGreen,
-                    focusedLabelColor = PrimaryDarkGreen
+                    unfocusedBorderColor = PrimaryDarkGreen,
+                    focusedLabelColor = PrimaryDarkGreen,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
                 )
             )
 
@@ -238,7 +243,7 @@ private fun <T> DropdownSelectField(
             value = selectedText,
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            label = { Text(label, color = MaterialTheme.colorScheme.onSurface) },
             leadingIcon = {
                 Icon(
                     imageVector = icon,
@@ -251,8 +256,12 @@ private fun <T> DropdownSelectField(
             },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                 focusedBorderColor = PrimaryDarkGreen,
-                focusedLabelColor = PrimaryDarkGreen
+                unfocusedBorderColor = PrimaryDarkGreen,
+                focusedLabelColor = PrimaryDarkGreen,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -265,7 +274,7 @@ private fun <T> DropdownSelectField(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = optionLabel(option)) },
+                    text = { Text(text = optionLabel(option), color = MaterialTheme.colorScheme.onSurface) },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false
