@@ -1,6 +1,10 @@
 package com.example.aquacheck.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.aquacheck.data.AppDatabase
+import com.example.aquacheck.data.PreChequeoEntity
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
 import com.example.aquacheck.model.EstadoItem
@@ -12,13 +16,27 @@ import com.example.aquacheck.model.Supervisor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-class PreChequeoViewModel : ViewModel() {
+class PreChequeoViewModel(application: Application? = null) : ViewModel() {
+
+    constructor() : this(null)
+
+    private val preChequeoDao = try {
+        if (application != null) {
+            AppDatabase.getDatabase(application).preChequeoDao()
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        null
+    }
 
     private val _uiState = MutableStateFlow(
         PreChequeoUiState(
@@ -29,15 +47,31 @@ class PreChequeoViewModel : ViewModel() {
             currentDate = getCurrentFormattedDate(),
             checklistItems = MockData.defaultChecklistItems,
             evidencias = emptyList(),
-            resultado = null
+            resultado = null,
+            searchQuery = "",
+            selectedFilter = "Todos"
         )
     )
     val uiState: StateFlow<PreChequeoUiState> = _uiState.asStateFlow()
 
-    /**
-     * Valida las credenciales ingresadas (supervisor / 1234 o jefe / 1234).
-     * Retorna true si son válidas y actualiza el usuario activo en el estado.
-     */
+    init {
+        if (preChequeoDao != null) {
+            viewModelScope.launch {
+                preChequeoDao.getAllPreChequeos().collectLatest { entities ->
+                    val preChequeosList = if (entities.isEmpty()) {
+                        MockData.mockPreChequeos.forEach { mock ->
+                            preChequeoDao.insertPreChequeo(PreChequeoEntity.fromDomain(mock))
+                        }
+                        MockData.mockPreChequeos
+                    } else {
+                        entities.map { it.toDomain() }
+                    }
+                    _uiState.update { it.copy(preChequeos = preChequeosList) }
+                }
+            }
+        }
+    }
+
     fun login(usuario: String, clave: String): Boolean {
         val cleanUsername = usuario.trim().lowercase()
         val userObj = when {
@@ -58,9 +92,6 @@ class PreChequeoViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Cierra la sesión activa limpiando el usuario logueado.
-     */
     fun logout() {
         _uiState.update { it.copy(currentUser = null) }
     }
@@ -70,27 +101,18 @@ class PreChequeoViewModel : ViewModel() {
         return sdf.format(Date())
     }
 
-    /**
-     * Agrega una nueva evidencia fotográfica al estado actual.
-     */
     fun addEvidencia(evidencia: EvidenciaItem) {
         _uiState.update { currentState ->
             currentState.copy(evidencias = currentState.evidencias + evidencia)
         }
     }
 
-    /**
-     * Elimina una evidencia por su ID.
-     */
     fun removeEvidencia(evidenciaId: String) {
         _uiState.update { currentState ->
             currentState.copy(evidencias = currentState.evidencias.filterNot { it.id == evidenciaId })
         }
     }
 
-    /**
-     * Actualiza el estado de un item del checklist por su id.
-     */
     fun updateItemStatus(itemId: String, nuevoEstado: EstadoItem) {
         _uiState.update { currentState ->
             val updatedItems = currentState.checklistItems.map { item ->
@@ -105,9 +127,6 @@ class PreChequeoViewModel : ViewModel() {
 
     fun updateItemEstado(itemId: String, nuevoEstado: EstadoItem) = updateItemStatus(itemId, nuevoEstado)
 
-    /**
-     * Setea los datos generales del formulario de pre-chequeo.
-     */
     fun setFormData(
         centro: Centro? = _uiState.value.currentCentro,
         fecha: String = _uiState.value.currentDate,
@@ -122,6 +141,14 @@ class PreChequeoViewModel : ViewModel() {
                 currentSupervisor = supervisor
             )
         }
+    }
+
+    fun setSearchQuery(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+    }
+
+    fun setSelectedFilter(filter: String) {
+        _uiState.update { it.copy(selectedFilter = filter) }
     }
 
     fun setCentro(centro: Centro?) {
@@ -140,11 +167,6 @@ class PreChequeoViewModel : ViewModel() {
         _uiState.update { it.copy(currentSupervisor = supervisor) }
     }
 
-    /**
-     * Calcula el resultado final según las reglas de negocio:
-     * - Si CUALQUIER item es NO_CUMPLE u OBSERVADO, el resultado es "Observado".
-     * - Si TODOS son CUMPLE, el resultado es "Apto".
-     */
     fun calculateResult(): Resultado {
         val currentState = _uiState.value
         val items = currentState.checklistItems
@@ -178,9 +200,6 @@ class PreChequeoViewModel : ViewModel() {
 
     fun calcularResultado(): Resultado = calculateResult()
 
-    /**
-     * Guarda / confirma el pre-chequeo actual agregándolo al historial de preChequeos.
-     */
     fun commitPreCheck(): PreChequeo? {
         val currentState = _uiState.value
         val buzo = currentState.currentBuzo ?: return null
@@ -200,9 +219,18 @@ class PreChequeoViewModel : ViewModel() {
             resultado = resultadoCalculado.estado
         )
 
+        if (preChequeoDao != null) {
+            viewModelScope.launch {
+                preChequeoDao.insertPreChequeo(PreChequeoEntity.fromDomain(nuevoPreChequeo))
+            }
+        } else {
+            _uiState.update { state ->
+                state.copy(preChequeos = listOf(nuevoPreChequeo) + state.preChequeos)
+            }
+        }
+
         _uiState.update { state ->
             state.copy(
-                preChequeos = listOf(nuevoPreChequeo) + state.preChequeos,
                 checklistItems = MockData.defaultChecklistItems,
                 evidencias = emptyList(),
                 resultado = null

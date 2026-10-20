@@ -207,6 +207,8 @@ fun ResumenContent(
                             EstadoItem.CUMPLE -> "APTO"
                             EstadoItem.OBSERVADO -> "OBSERVADO"
                             EstadoItem.NO_CUMPLE -> "OBSERVADO"
+                            EstadoItem.PENDIENTE -> "PENDIENTE"
+                            EstadoItem.NO_APLICA -> "N/A"
                         }
                         StatusChip(status = statusString)
                     }

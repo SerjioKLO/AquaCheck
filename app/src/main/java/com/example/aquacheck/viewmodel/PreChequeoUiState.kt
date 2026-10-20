@@ -30,5 +30,7 @@ data class PreChequeoUiState(
     val consumioAlcohol24hrs: Boolean = false,
     val nivelSalud: NivelSalud? = null,
     val observacionesText: String = "",
-    val evidenciasUris: List<String> = emptyList()
+    val evidenciasUris: List<String> = emptyList(),
+    val searchQuery: String = "",
+    val selectedFilter: String = "Todos"
 )

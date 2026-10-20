@@ -24,11 +24,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Sync
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -78,6 +81,8 @@ fun InicioScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     InicioContent(
         uiState = uiState,
+        onSearchQueryChange = { viewModel.setSearchQuery(it) },
+        onFilterSelected = { viewModel.setSelectedFilter(it) },
         onNewPreChequeoClick = onNewPreChequeoClick,
         onLogoutClick = {
             viewModel.logout()
@@ -90,6 +95,8 @@ fun InicioScreen(
 @Composable
 fun InicioContent(
     uiState: PreChequeoUiState,
+    onSearchQueryChange: (String) -> Unit,
+    onFilterSelected: (String) -> Unit,
     onNewPreChequeoClick: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -122,6 +129,21 @@ fun InicioContent(
     }
 
     val isSupervisor = uiState.currentUser?.rol == RolUsuario.SUPERVISOR
+
+    val filteredPreChequeos = uiState.preChequeos.filter { preChequeo ->
+        val matchesSearch = uiState.searchQuery.isBlank() ||
+            preChequeo.buzo.nombre.contains(uiState.searchQuery, ignoreCase = true) ||
+            preChequeo.centro.nombre.contains(uiState.searchQuery, ignoreCase = true) ||
+            preChequeo.fecha.contains(uiState.searchQuery, ignoreCase = true)
+
+        val matchesFilter = when (uiState.selectedFilter) {
+            "Apto" -> preChequeo.resultado.equals("Apto", ignoreCase = true)
+            "Observado" -> preChequeo.resultado.equals("Observado", ignoreCase = true)
+            else -> true
+        }
+
+        matchesSearch && matchesFilter
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -219,8 +241,53 @@ fun InicioContent(
                 .background(BackgroundLight)
         ) {
             when (selectedTab) {
-                0 -> HistorialTab(preChequeos = uiState.preChequeos)
-                1 -> HistorialTab(preChequeos = uiState.preChequeos)
+                0, 1 -> {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = uiState.searchQuery,
+                                onValueChange = onSearchQueryChange,
+                                label = { Text("Buscar por buzo, centro o fecha...") },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Search,
+                                        contentDescription = null,
+                                        tint = PrimaryDarkGreen
+                                    )
+                                },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                listOf("Todos", "Apto", "Observado").forEach { filter ->
+                                    val isSelected = uiState.selectedFilter == filter
+                                    FilterChip(
+                                        selected = isSelected,
+                                        onClick = { onFilterSelected(filter) },
+                                        label = { Text(filter) },
+                                        shape = RoundedCornerShape(20.dp),
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            }
+                        }
+
+                        HistorialTab(
+                            preChequeos = filteredPreChequeos,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
                 2 -> PerfilTab(uiState = uiState)
             }
 
@@ -245,7 +312,7 @@ private fun HistorialTab(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No hay registros de pre-chequeos.",
+                text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -341,6 +408,8 @@ fun InicioScreenPreview() {
     AquaCheckTheme {
         InicioContent(
             uiState = PreChequeoUiState(preChequeos = MockData.mockPreChequeos),
+            onSearchQueryChange = {},
+            onFilterSelected = {},
             onNewPreChequeoClick = {},
             onLogoutClick = {}
         )

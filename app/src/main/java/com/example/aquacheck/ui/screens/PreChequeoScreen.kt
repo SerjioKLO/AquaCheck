@@ -91,6 +91,7 @@ fun PreChequeoContent(
     var selectedSupervisor by remember(uiState.currentSupervisor) {
         mutableStateOf(uiState.currentSupervisor ?: MockData.mockSupervisores.firstOrNull())
     }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -132,13 +133,19 @@ fun PreChequeoContent(
                 icon = Icons.Rounded.Place,
                 options = MockData.mockCentros,
                 optionLabel = { it.nombre },
-                onOptionSelected = { selectedCentro = it }
+                onOptionSelected = {
+                    selectedCentro = it
+                    errorMessage = null
+                }
             )
 
             // Fecha Text Field
             OutlinedTextField(
                 value = fechaText,
-                onValueChange = { fechaText = it },
+                onValueChange = {
+                    fechaText = it
+                    errorMessage = null
+                },
                 label = { Text("Fecha de Inspección") },
                 leadingIcon = {
                     Icon(
@@ -163,7 +170,10 @@ fun PreChequeoContent(
                 icon = Icons.Rounded.Badge,
                 options = MockData.mockBuzos,
                 optionLabel = { "${it.nombre} (${it.certificacion})" },
-                onOptionSelected = { selectedBuzo = it }
+                onOptionSelected = {
+                    selectedBuzo = it
+                    errorMessage = null
+                }
             )
 
             // Supervisor Selection
@@ -173,8 +183,20 @@ fun PreChequeoContent(
                 icon = Icons.Rounded.SupervisorAccount,
                 options = MockData.mockSupervisores,
                 optionLabel = { it.nombre },
-                onOptionSelected = { selectedSupervisor = it }
+                onOptionSelected = {
+                    selectedSupervisor = it
+                    errorMessage = null
+                }
             )
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -182,7 +204,12 @@ fun PreChequeoContent(
                 text = "Continuar",
                 icon = Icons.Rounded.Anchor,
                 onClick = {
-                    onContinuar(selectedCentro, fechaText, selectedBuzo, selectedSupervisor)
+                    if (selectedCentro == null || selectedBuzo == null || selectedSupervisor == null || fechaText.isBlank()) {
+                        errorMessage = "Por favor complete todos los campos obligatorios."
+                    } else {
+                        errorMessage = null
+                        onContinuar(selectedCentro, fechaText, selectedBuzo, selectedSupervisor)
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
