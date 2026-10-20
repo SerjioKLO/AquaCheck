@@ -1,7 +1,9 @@
 package com.example.aquacheck.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,6 +24,11 @@ fun AppNavigation(
     navController: NavHostController = rememberNavController(),
     viewModel: PreChequeoViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.initDatabase(context)
+    }
+
     NavHost(
         navController = navController,
         startDestination = "login",

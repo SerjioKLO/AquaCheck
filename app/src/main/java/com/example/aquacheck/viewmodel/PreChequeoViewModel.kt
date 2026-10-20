@@ -1,9 +1,10 @@
 package com.example.aquacheck.viewmodel
 
-import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aquacheck.data.AppDatabase
+import com.example.aquacheck.data.PreChequeoDao
 import com.example.aquacheck.data.PreChequeoEntity
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
@@ -24,19 +25,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-class PreChequeoViewModel(application: Application? = null) : ViewModel() {
+class PreChequeoViewModel : ViewModel() {
 
-    constructor() : this(null)
-
-    private val preChequeoDao = try {
-        if (application != null) {
-            AppDatabase.getDatabase(application).preChequeoDao()
-        } else {
-            null
-        }
-    } catch (e: Exception) {
-        null
-    }
+    private var preChequeoDao: PreChequeoDao? = null
 
     private val _uiState = MutableStateFlow(
         PreChequeoUiState(
@@ -54,13 +45,16 @@ class PreChequeoViewModel(application: Application? = null) : ViewModel() {
     )
     val uiState: StateFlow<PreChequeoUiState> = _uiState.asStateFlow()
 
-    init {
-        if (preChequeoDao != null) {
+    fun initDatabase(context: Context) {
+        if (preChequeoDao != null) return
+        try {
+            val dao = AppDatabase.getDatabase(context).preChequeoDao()
+            preChequeoDao = dao
             viewModelScope.launch {
-                preChequeoDao.getAllPreChequeos().collectLatest { entities ->
+                dao.getAllPreChequeos().collectLatest { entities ->
                     val preChequeosList = if (entities.isEmpty()) {
                         MockData.mockPreChequeos.forEach { mock ->
-                            preChequeoDao.insertPreChequeo(PreChequeoEntity.fromDomain(mock))
+                            dao.insertPreChequeo(PreChequeoEntity.fromDomain(mock))
                         }
                         MockData.mockPreChequeos
                     } else {
@@ -69,6 +63,8 @@ class PreChequeoViewModel(application: Application? = null) : ViewModel() {
                     _uiState.update { it.copy(preChequeos = preChequeosList) }
                 }
             }
+        } catch (e: Exception) {
+            // Fallback if database fails
         }
     }
 
@@ -240,9 +236,10 @@ class PreChequeoViewModel(application: Application? = null) : ViewModel() {
             resultado = resultadoCalculado.estado
         )
 
-        if (preChequeoDao != null) {
+        val dao = preChequeoDao
+        if (dao != null) {
             viewModelScope.launch {
-                preChequeoDao.insertPreChequeo(PreChequeoEntity.fromDomain(nuevoPreChequeo))
+                dao.insertPreChequeo(PreChequeoEntity.fromDomain(nuevoPreChequeo))
             }
         } else {
             _uiState.update { state ->
