@@ -2,6 +2,7 @@ package com.example.aquacheck.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,8 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.aquacheck.model.EstadoItem
 import com.example.aquacheck.model.ItemChecklist
@@ -160,7 +163,7 @@ private fun ChecklistItemCard(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Option 1: Cumple
@@ -169,10 +172,18 @@ private fun ChecklistItemCard(
                 selected = isCumple,
                 onClick = { onEstadoSelected(EstadoItem.CUMPLE) },
                 label = {
-                    Text(
-                        text = "Cumple",
-                        fontWeight = if (isCumple) FontWeight.Bold else FontWeight.Normal
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Cumple",
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            fontWeight = if (isCumple) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = FilterChipDefaults.filterChipColors(
@@ -188,10 +199,18 @@ private fun ChecklistItemCard(
                 selected = isObservado,
                 onClick = { onEstadoSelected(EstadoItem.OBSERVADO) },
                 label = {
-                    Text(
-                        text = "Observado",
-                        fontWeight = if (isObservado) FontWeight.Bold else FontWeight.Normal
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Observado",
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            fontWeight = if (isObservado) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = FilterChipDefaults.filterChipColors(
@@ -207,10 +226,18 @@ private fun ChecklistItemCard(
                 selected = isNoCumple,
                 onClick = { onEstadoSelected(EstadoItem.NO_CUMPLE) },
                 label = {
-                    Text(
-                        text = "No Cumple",
-                        fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.Normal
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No Cumple",
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = FilterChipDefaults.filterChipColors(
