@@ -7,6 +7,7 @@ import com.example.aquacheck.data.AppDatabase
 import com.example.aquacheck.data.PreChequeoRepository
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
+import com.example.aquacheck.model.DatosSalud
 import com.example.aquacheck.model.EstadoItem
 import com.example.aquacheck.model.EvidenciaItem
 import com.example.aquacheck.model.MockData
@@ -24,7 +25,13 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-class PreChequeoViewModel : ViewModel() {
+data class ResultadoValidacionSalud(
+    val esApto: Boolean,
+    val estado: String,
+    val observaciones: List<String>
+)
+
+open class PreChequeoViewModel : ViewModel() {
 
     private var repository: PreChequeoRepository? = null
 
@@ -144,6 +151,141 @@ class PreChequeoViewModel : ViewModel() {
         }
     }
 
+    fun setFrecuenciaCardiaca(text: String) {
+        _uiState.update { it.copy(frecuenciaCardiacaText = text, resultado = null) }
+        validarSalud()
+    }
+
+    fun setSistolica(text: String) {
+        _uiState.update { it.copy(sistolicaText = text, resultado = null) }
+        validarSalud()
+    }
+
+    fun setDiastolica(text: String) {
+        _uiState.update { it.copy(diastolicaText = text, resultado = null) }
+        validarSalud()
+    }
+
+    fun setSaturacion(text: String) {
+        _uiState.update { it.copy(saturacionText = text, resultado = null) }
+        validarSalud()
+    }
+
+    fun setHorasSueno(text: String) {
+        _uiState.update { it.copy(horasSuenoText = text, resultado = null) }
+        validarSalud()
+    }
+
+    fun setHorasUltimoAlcohol(text: String) {
+        _uiState.update { it.copy(horasUltimoAlcoholText = text, resultado = null) }
+        validarSalud()
+    }
+
+    fun setTieneCongestionNasal(value: Boolean) {
+        _uiState.update { it.copy(tieneCongestionNasal = value, resultado = null) }
+        validarSalud()
+    }
+
+    fun setTomaMedicamentosNuevos(value: Boolean) {
+        _uiState.update { it.copy(tomaMedicamentosNuevos = value, resultado = null) }
+        validarSalud()
+    }
+
+    fun setEstadoPsicologicoCalmo(value: Boolean) {
+        _uiState.update { it.copy(estadoPsicologicoCalmo = value, resultado = null) }
+        validarSalud()
+    }
+
+    fun validarSalud(): ResultadoValidacionSalud {
+        val state = _uiState.value
+        val fallas = mutableListOf<String>()
+
+        if (state.frecuenciaCardiacaText.isBlank()) {
+            fallas.add("Frecuencia Cardíaca: Campo sin ingresar")
+        } else {
+            val fc = state.frecuenciaCardiacaText.toIntOrNull()
+            if (fc == null || fc !in 50..100) {
+                fallas.add("Frecuencia Cardíaca (${fc ?: state.frecuenciaCardiacaText} lpm): debe estar entre 50 y 100 lpm")
+            }
+        }
+
+        if (state.sistolicaText.isBlank()) {
+            fallas.add("Presión Sistólica: Campo sin ingresar")
+        } else {
+            val sis = state.sistolicaText.toIntOrNull()
+            if (sis == null || sis !in 90..140) {
+                fallas.add("Presión Sistólica (${sis ?: state.sistolicaText} mmHg): debe estar entre 90 y 140 mmHg")
+            }
+        }
+
+        if (state.diastolicaText.isBlank()) {
+            fallas.add("Presión Diastólica: Campo sin ingresar")
+        } else {
+            val dia = state.diastolicaText.toIntOrNull()
+            if (dia == null || dia !in 60..90) {
+                fallas.add("Presión Diastólica (${dia ?: state.diastolicaText} mmHg): debe estar entre 60 y 90 mmHg")
+            }
+        }
+
+        if (state.saturacionText.isBlank()) {
+            fallas.add("Saturación SpO2: Campo sin ingresar")
+        } else {
+            val sat = state.saturacionText.toIntOrNull()
+            if (sat == null || sat !in 95..100) {
+                fallas.add("Saturación SpO2 (${sat ?: state.saturacionText}%): debe ser mínimo 95%")
+            }
+        }
+
+        if (state.horasSuenoText.isBlank()) {
+            fallas.add("Horas de Sueño: Campo sin ingresar")
+        } else {
+            val sueno = state.horasSuenoText.toIntOrNull()
+            if (sueno == null || sueno < 6) {
+                fallas.add("Horas de Sueño (${sueno ?: state.horasSuenoText}h): mínimo 6 horas de descanso")
+            }
+        }
+
+        if (state.horasUltimoAlcoholText.isBlank()) {
+            fallas.add("Tiempo sin Alcohol: Campo sin ingresar")
+        } else {
+            val alcohol = state.horasUltimoAlcoholText.toIntOrNull()
+            if (alcohol == null || alcohol <= 12) {
+                fallas.add("Consumo de Alcohol (${alcohol ?: state.horasUltimoAlcoholText}h): requiere mínimo 12 horas libre de alcohol")
+            }
+        }
+
+        if (state.tieneCongestionNasal) {
+            fallas.add("Congestión Nasal/Sinusal: Incompatible con inmersión (riesgo de barotrauma)")
+        }
+
+        if (state.tomaMedicamentosNuevos) {
+            fallas.add("Medicamentos Nuevos/Sedantes: Incompatible con buceo")
+        }
+
+        if (!state.estadoPsicologicoCalmo) {
+            fallas.add("Estado Psicológico: Requiere estado calmo y enfocado")
+        }
+
+        val esApto = fallas.isEmpty()
+        val estadoRes = if (esApto) "Apto" else "Inhabilitado / Requiere Revisión"
+
+        val res = ResultadoValidacionSalud(
+            esApto = esApto,
+            estado = estadoRes,
+            observaciones = fallas
+        )
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                saludApto = esApto,
+                alertaSalud = if (esApto) null else fallas.joinToString("\n• "),
+                mensajesValidacionSalud = fallas
+            )
+        }
+
+        return res
+    }
+
     fun setSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
     }
@@ -186,27 +328,35 @@ class PreChequeoViewModel : ViewModel() {
 
     fun calculateResult(): Resultado {
         val currentState = _uiState.value
-        val items = currentState.checklistItems
 
-        val isApto = items.all { it.estado == EstadoItem.CUMPLE }
-        val estadoResult = if (isApto) "Apto" else "Observado"
+        val validacionSalud = validarSalud()
+        val items = currentState.checklistItems
+        val isChecklistApto = items.all { it.estado == EstadoItem.CUMPLE }
+
+        val estadoFinal = when {
+            !validacionSalud.esApto -> "Inhabilitado / Requiere Revisión"
+            !isChecklistApto -> "Observado"
+            else -> "Apto"
+        }
 
         val cumpleCount = items.count { it.estado == EstadoItem.CUMPLE }
         val noCumpleCount = items.count { it.estado == EstadoItem.NO_CUMPLE }
         val observadoCount = items.count { it.estado == EstadoItem.OBSERVADO }
 
-        val resumen = if (isApto) {
-            "${items.size}/${items.size} Cumple"
+        val resumen = if (estadoFinal == "Apto") {
+            "Salud Apta | ${items.size}/${items.size} Equipamiento Cumple"
+        } else if (!validacionSalud.esApto) {
+            "Salud Inhabilitada (${validacionSalud.observaciones.size} observaciones)"
         } else {
             val partes = mutableListOf<String>()
             if (cumpleCount > 0) partes.add("$cumpleCount Cumple")
             if (observadoCount > 0) partes.add("$observadoCount Observado")
             if (noCumpleCount > 0) partes.add("$noCumpleCount No Cumple")
-            partes.joinToString(", ")
+            "Salud Apta | " + partes.joinToString(", ")
         }
 
         val resultadoCalculado = Resultado(
-            estado = estadoResult,
+            estado = estadoFinal,
             fecha = currentState.currentDate,
             resumenChecklist = resumen
         )
@@ -225,6 +375,13 @@ class PreChequeoViewModel : ViewModel() {
 
         val resultadoCalculado = currentState.resultado ?: calculateResult()
 
+        val fcInt = currentState.frecuenciaCardiacaText.toIntOrNull() ?: 0
+        val sisInt = currentState.sistolicaText.toIntOrNull() ?: 0
+        val diaInt = currentState.diastolicaText.toIntOrNull() ?: 0
+        val satInt = currentState.saturacionText.toIntOrNull() ?: 0
+        val suenoInt = currentState.horasSuenoText.toIntOrNull() ?: 0
+        val alcoholInt = currentState.horasUltimoAlcoholText.toIntOrNull() ?: 0
+
         val nuevoPreChequeo = PreChequeo(
             id = UUID.randomUUID().toString(),
             buzo = buzo,
@@ -233,7 +390,30 @@ class PreChequeoViewModel : ViewModel() {
             fecha = currentState.currentDate,
             items = currentState.checklistItems,
             evidencias = currentState.evidencias,
-            resultado = resultadoCalculado.estado
+            resultado = resultadoCalculado.estado,
+            frecuenciaCardiaca = fcInt,
+            sistolica = sisInt,
+            diastolica = diaInt,
+            saturacion = satInt,
+            horasSueno = suenoInt,
+            horasUltimoAlcohol = alcoholInt,
+            tieneCongestionNasal = currentState.tieneCongestionNasal,
+            tomaMedicamentosNuevos = currentState.tomaMedicamentosNuevos,
+            estadoPsicologicoCalmo = currentState.estadoPsicologicoCalmo,
+            salud = DatosSalud(
+                frecuenciaCardiaca = fcInt,
+                sistolica = sisInt,
+                diastolica = diaInt,
+                saturacion = satInt,
+                horasSueno = suenoInt,
+                horasUltimoAlcohol = alcoholInt,
+                tieneCongestionNasal = currentState.tieneCongestionNasal,
+                tomaMedicamentosNuevos = currentState.tomaMedicamentosNuevos,
+                estadoPsicologicoCalmo = currentState.estadoPsicologicoCalmo,
+                presionsistolica = sisInt,
+                presionDiastolica = diaInt,
+                saturacionOxigeno = satInt
+            )
         )
 
         val repo = repository

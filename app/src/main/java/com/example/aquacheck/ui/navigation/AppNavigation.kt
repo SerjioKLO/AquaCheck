@@ -16,6 +16,7 @@ import com.example.aquacheck.ui.screens.LoginScreen
 import com.example.aquacheck.ui.screens.PerfilScreen
 import com.example.aquacheck.ui.screens.PreChequeoScreen
 import com.example.aquacheck.ui.screens.ResumenScreen
+import com.example.aquacheck.ui.screens.SaludScreen
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
 
 @Composable
@@ -76,8 +77,19 @@ fun AppNavigation(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onNavigateToChecklist = { id ->
-                    navController.navigate("checklist/$id")
+                onNavigateToSalud = {
+                    navController.navigate("salud")
+                }
+            )
+        }
+        composable("salud") {
+            SaludScreen(
+                viewModel = viewModel,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onNavigateToChecklist = {
+                    navController.navigate("checklist/1")
                 }
             )
         }

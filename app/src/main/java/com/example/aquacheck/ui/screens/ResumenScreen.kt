@@ -99,7 +99,7 @@ fun ResumenContent(
     val headerContainerColor = if (isApto) AptoContainerGreen else ObservadoContainerRed
     val headerTextColor = if (isApto) OnAptoContainerGreen else ObservadoRed
     val headerIcon = if (isApto) Icons.Rounded.CheckCircle else Icons.Rounded.Warning
-    val statusText = if (isApto) "ESTADO: APTO" else "ESTADO: OBSERVADO"
+    val statusText = if (isApto) "ESTADO: APTO" else "ESTADO: ${resultado.estado.uppercase()}"
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -147,7 +147,8 @@ fun ResumenContent(
                         text = "Evaluación: ${resultado.resumenChecklist}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = headerTextColor
+                        color = headerTextColor,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -181,8 +182,31 @@ fun ResumenContent(
                 HorizontalDivider(color = OutlineBorder)
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Medical Health Section Summary
                 Text(
-                    text = "Desglose de Puntos Evaluados",
+                    text = "Parámetros Médicos Fisiológicos",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryDarkGreen
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                DetailItem(label = "Frecuencia Cardíaca", value = "${uiState.frecuenciaCardiacaText} lpm")
+                DetailItem(label = "Presión Arterial", value = "${uiState.sistolicaText} / ${uiState.diastolicaText} mmHg")
+                DetailItem(label = "Saturación SpO2", value = "${uiState.saturacionText}%")
+                DetailItem(label = "Horas de Sueño", value = "${uiState.horasSuenoText} hrs")
+                DetailItem(label = "Tiempo sin Alcohol", value = "${uiState.horasUltimoAlcoholText} hrs")
+                DetailItem(label = "Congestión Nasal", value = if (uiState.tieneCongestionNasal) "Sí (Alerta)" else "No (Normal)")
+                DetailItem(label = "Medicamentos Nuevos", value = if (uiState.tomaMedicamentosNuevos) "Sí (Alerta)" else "No (Normal)")
+                DetailItem(label = "Estado Psicológico", value = if (uiState.estadoPsicologicoCalmo) "Calmo" else "Alterado")
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = OutlineBorder)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Desglose de Equipamiento Faena",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryDarkGreen

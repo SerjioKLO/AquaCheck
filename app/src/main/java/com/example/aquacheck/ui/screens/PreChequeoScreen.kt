@@ -56,7 +56,7 @@ import com.example.aquacheck.viewmodel.PreChequeoViewModel
 fun PreChequeoScreen(
     viewModel: PreChequeoViewModel,
     onBackClick: () -> Unit,
-    onNavigateToChecklist: (String) -> Unit,
+    onNavigateToSalud: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +66,7 @@ fun PreChequeoScreen(
         onBackClick = onBackClick,
         onContinuar = { centro, fecha, buzo, supervisor ->
             viewModel.setFormData(centro = centro, fecha = fecha, buzo = buzo, supervisor = supervisor)
-            onNavigateToChecklist("1")
+            onNavigateToSalud()
         },
         modifier = modifier
     )
@@ -206,7 +206,7 @@ fun PreChequeoContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             PrimaryButton(
-                text = "Continuar",
+                text = "Continuar a Salud",
                 icon = Icons.Rounded.Anchor,
                 onClick = {
                     if (selectedCentro == null || selectedBuzo == null || selectedSupervisor == null || fechaText.isBlank()) {
