@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,6 +82,7 @@ fun InicioScreen(
     onNewPreChequeoClick: () -> Unit,
     onNavigateToPerfil: () -> Unit,
     onLogoutClick: () -> Unit,
+    onDetalleClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -94,6 +96,7 @@ fun InicioScreen(
             viewModel.logout()
             onLogoutClick()
         },
+        onDetalleClick = onDetalleClick,
         modifier = modifier
     )
 }
@@ -106,6 +109,7 @@ fun InicioContent(
     onNewPreChequeoClick: () -> Unit,
     onNavigateToPerfil: () -> Unit,
     onLogoutClick: () -> Unit,
+    onDetalleClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -310,6 +314,7 @@ fun InicioContent(
 
                         HistorialTab(
                             preChequeos = filteredPreChequeos,
+                            onDetalleClick = onDetalleClick,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -329,6 +334,7 @@ fun InicioContent(
 @Composable
 private fun HistorialTab(
     preChequeos: List<PreChequeo>,
+    onDetalleClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (preChequeos.isEmpty()) {
@@ -350,7 +356,10 @@ private fun HistorialTab(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(preChequeos, key = { it.id }) { preChequeo ->
-                PreChequeoCard(preChequeo = preChequeo)
+                PreChequeoCard(
+                    preChequeo = preChequeo,
+                    onClick = { onDetalleClick(preChequeo.id) }
+                )
             }
         }
     }
@@ -359,10 +368,13 @@ private fun HistorialTab(
 @Composable
 private fun PreChequeoCard(
     preChequeo: PreChequeo,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AppCard(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -411,7 +423,8 @@ fun InicioScreenPreview() {
             onFilterSelected = {},
             onNewPreChequeoClick = {},
             onNavigateToPerfil = {},
-            onLogoutClick = {}
+            onLogoutClick = {},
+            onDetalleClick = {}
         )
     }
 }

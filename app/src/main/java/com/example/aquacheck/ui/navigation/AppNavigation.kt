@@ -6,10 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.aquacheck.ui.screens.ChecklistScreen
+import com.example.aquacheck.ui.screens.DetalleScreen
 import com.example.aquacheck.ui.screens.EvidenciasScreen
 import com.example.aquacheck.ui.screens.InicioScreen
 import com.example.aquacheck.ui.screens.LoginScreen
@@ -60,6 +63,9 @@ fun AppNavigation(
                     navController.navigate("login") {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onDetalleClick = { id ->
+                    navController.navigate("detalle/$id")
                 }
             )
         }
@@ -127,6 +133,16 @@ fun AppNavigation(
                     navController.navigate("inicio") {
                         popUpTo("inicio") { inclusive = true }
                     }
+                }
+            )
+        }
+        composable(
+            route = "detalle/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            DetalleScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
