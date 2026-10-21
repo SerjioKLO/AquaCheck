@@ -124,7 +124,7 @@ fun PreChequeoContent(
                     text = "Seleccione los datos para iniciar la verificación pre-inmersión.",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -148,7 +148,7 @@ fun PreChequeoContent(
                     fechaText = it
                     errorMessage = null
                 },
-                label = { Text("Fecha de Inspección", color = Color.Black, fontWeight = FontWeight.Bold) },
+                label = { Text("Fecha de Inspección", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.CalendarToday,
@@ -160,12 +160,12 @@ fun PreChequeoContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     focusedBorderColor = PrimaryDarkGreen,
                     unfocusedBorderColor = PrimaryDarkGreen,
                     focusedLabelColor = PrimaryDarkGreen,
-                    unfocusedLabelColor = Color.Black
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
                 )
             )
 
@@ -244,7 +244,7 @@ private fun <T> DropdownSelectField(
             value = selectedText,
             onValueChange = {},
             readOnly = true,
-            label = { Text(label, color = Color.Black, fontWeight = FontWeight.Bold) },
+            label = { Text(label, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
             leadingIcon = {
                 Icon(
                     imageVector = icon,
@@ -257,12 +257,12 @@ private fun <T> DropdownSelectField(
             },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                 focusedBorderColor = PrimaryDarkGreen,
                 unfocusedBorderColor = PrimaryDarkGreen,
                 focusedLabelColor = PrimaryDarkGreen,
-                unfocusedLabelColor = Color.Black
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -271,7 +271,8 @@ private fun <T> DropdownSelectField(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = Color.White
         ) {
             options.forEach { option ->
                 DropdownMenuItem(

@@ -81,7 +81,6 @@ import kotlinx.coroutines.launch
 fun InicioScreen(
     viewModel: PreChequeoViewModel,
     onNewPreChequeoClick: () -> Unit,
-    onNavigateToPerfil: () -> Unit,
     onLogoutClick: () -> Unit,
     onDetalleClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -92,12 +91,17 @@ fun InicioScreen(
         onSearchQueryChange = { viewModel.setSearchQuery(it) },
         onFilterSelected = { viewModel.setSelectedFilter(it) },
         onNewPreChequeoClick = onNewPreChequeoClick,
-        onNavigateToPerfil = onNavigateToPerfil,
         onLogoutClick = {
             viewModel.logout()
             onLogoutClick()
         },
         onDetalleClick = onDetalleClick,
+        onUpdateProfile = { nombre, rut, telefono ->
+            viewModel.updateProfile(nombre, rut, telefono)
+        },
+        onUpdateProfileImageUri = { uri ->
+            viewModel.updateProfileImageUri(uri)
+        },
         modifier = modifier
     )
 }
@@ -108,9 +112,10 @@ fun InicioContent(
     onSearchQueryChange: (String) -> Unit,
     onFilterSelected: (String) -> Unit,
     onNewPreChequeoClick: () -> Unit,
-    onNavigateToPerfil: () -> Unit,
     onLogoutClick: () -> Unit,
     onDetalleClick: (String) -> Unit,
+    onUpdateProfile: (String, String, String) -> Unit,
+    onUpdateProfileImageUri: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -162,7 +167,7 @@ fun InicioContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppTopAppBar(
-                title = "AquaCheck",
+                title = if (selectedTab == 2) "Mi Perfil" else "AquaCheck",
                 actions = {
                     TextButton(onClick = onLogoutClick) {
                         Text(
@@ -184,7 +189,7 @@ fun InicioContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(BackgroundLight)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Row(
@@ -222,8 +227,6 @@ fun InicioContent(
                     onTabSelected = { index ->
                         if (index == 1) {
                             startSyncProcess()
-                        } else if (index == 2) {
-                            onNavigateToPerfil()
                         } else {
                             selectedTab = index
                         }
@@ -285,7 +288,8 @@ fun InicioContent(
                                         }
                                         DropdownMenu(
                                             expanded = filterMenuExpanded,
-                                            onDismissRequest = { filterMenuExpanded = false }
+                                            onDismissRequest = { filterMenuExpanded = false },
+                                            containerColor = Color.White
                                         ) {
                                             listOf("Todos", "Apto", "Observado").forEach { filter ->
                                                 DropdownMenuItem(
@@ -319,6 +323,14 @@ fun InicioContent(
                             modifier = Modifier.weight(1f)
                         )
                     }
+                }
+                2 -> {
+                    PerfilContentInline(
+                        uiState = uiState,
+                        onUpdateProfile = onUpdateProfile,
+                        onUpdateProfileImageUri = onUpdateProfileImageUri,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
 
@@ -396,19 +408,19 @@ private fun PreChequeoCard(
         Text(
             text = "Buzo: ${preChequeo.buzo.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             color = Color.Black
         )
         Text(
             text = "Supervisor: ${preChequeo.supervisor.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             color = Color.Black
         )
         Text(
             text = "Centro: ${preChequeo.centro.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             color = Color.Black
         )
     }
@@ -423,9 +435,10 @@ fun InicioScreenPreview() {
             onSearchQueryChange = {},
             onFilterSelected = {},
             onNewPreChequeoClick = {},
-            onNavigateToPerfil = {},
             onLogoutClick = {},
-            onDetalleClick = {}
+            onDetalleClick = {},
+            onUpdateProfile = { _, _, _ -> },
+            onUpdateProfileImageUri = {}
         )
     }
 }

@@ -16,7 +16,6 @@ import com.example.aquacheck.ui.screens.DetalleScreen
 import com.example.aquacheck.ui.screens.EvidenciasScreen
 import com.example.aquacheck.ui.screens.InicioScreen
 import com.example.aquacheck.ui.screens.LoginScreen
-import com.example.aquacheck.ui.screens.PerfilScreen
 import com.example.aquacheck.ui.screens.PreChequeoScreen
 import com.example.aquacheck.ui.screens.ResumenScreen
 import com.example.aquacheck.ui.screens.SaludScreen
@@ -56,9 +55,6 @@ fun AppNavigation(
                 onNewPreChequeoClick = {
                     navController.navigate("prechequeo")
                 },
-                onNavigateToPerfil = {
-                    navController.navigate("perfil")
-                },
                 onLogoutClick = {
                     navController.navigate("login") {
                         popUpTo(0) { inclusive = true }
@@ -66,14 +62,6 @@ fun AppNavigation(
                 },
                 onDetalleClick = { id ->
                     navController.navigate("detalle/$id")
-                }
-            )
-        }
-        composable("perfil") {
-            PerfilScreen(
-                viewModel = viewModel,
-                onBackClick = {
-                    navController.popBackStack()
                 }
             )
         }

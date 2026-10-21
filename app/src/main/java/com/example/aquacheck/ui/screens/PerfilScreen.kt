@@ -33,7 +33,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,11 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.aquacheck.ui.components.AppCard
-import com.example.aquacheck.ui.components.AppTopAppBar
 import com.example.aquacheck.ui.theme.AquaCheckTheme
-import com.example.aquacheck.ui.theme.BackgroundLight
-import com.example.aquacheck.ui.theme.OnBackgroundText
-import com.example.aquacheck.ui.theme.OutlineBorder
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
 import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
@@ -67,14 +62,12 @@ import com.example.aquacheck.viewmodel.PreChequeoViewModel
 @Composable
 fun PerfilScreen(
     viewModel: PreChequeoViewModel,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    PerfilContent(
+    PerfilContentInline(
         uiState = uiState,
-        onBackClick = onBackClick,
         onUpdateProfile = { nombre, rut, telefono ->
             viewModel.updateProfile(nombre, rut, telefono)
         },
@@ -86,9 +79,8 @@ fun PerfilScreen(
 }
 
 @Composable
-fun PerfilContent(
+fun PerfilContentInline(
     uiState: PreChequeoUiState,
-    onBackClick: () -> Unit,
     onUpdateProfile: (String, String, String) -> Unit,
     onUpdateProfileImageUri: (String?) -> Unit,
     modifier: Modifier = Modifier
@@ -105,163 +97,153 @@ fun PerfilContent(
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            AppTopAppBar(
-                title = "MI PERFIL",
-                onBackClick = onBackClick
-            )
-        }
-    ) { innerPadding ->
-        Box(
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState()),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(BackgroundLight)
-                .verticalScroll(rememberScrollState()),
-            contentAlignment = Alignment.TopCenter
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
+            Spacer(modifier = Modifier.height(8.dp))
+            // Profile Picture with dropdown menu
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .size(130.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFE2E8F0))
+                    .clickable { menuExpanded = true },
+                contentAlignment = Alignment.Center
             ) {
-                // Profile Picture with dropdown menu
-                Box(
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE2E8F0))
-                        .clickable { menuExpanded = true },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (uiState.profileImageUri != null) {
-                        AsyncImage(
-                            model = uiState.profileImageUri,
-                            contentDescription = "Foto de perfil",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Outlined.Person,
-                            contentDescription = null,
-                            tint = Color.Gray,
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Ver foto de perfil") },
-                            onClick = {
-                                menuExpanded = false
-                                showViewPhotoDialog = true
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Editar foto de perfil") },
-                            onClick = {
-                                menuExpanded = false
-                                galleryLauncher.launch("image/*")
-                            }
-                        )
-                    }
-                }
-
-                Text(
-                    text = uiState.profileNombre,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = OnBackgroundText
-                )
-
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFFE8F5E9),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF2E7D32))
-                        )
-                        Text(
-                            text = "Perfil verificado",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2E7D32)
-                        )
-                    }
-                }
-
-                AppCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        ProfileInfoRow(
-                            icon = Icons.Outlined.Person,
-                            label = "Nombre y apellido",
-                            value = uiState.profileNombre
-                        )
-                        HorizontalDivider(color = OutlineBorder)
-                        ProfileInfoRow(
-                            icon = Icons.Outlined.Badge,
-                            label = "RUT",
-                            value = uiState.profileRut
-                        )
-                        HorizontalDivider(color = OutlineBorder)
-                        ProfileInfoRow(
-                            icon = Icons.Outlined.Phone,
-                            label = "Número de teléfono",
-                            value = uiState.profileTelefono
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = { showEditDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryDarkGreen,
-                        contentColor = Color.White
+                if (uiState.profileImageUri != null) {
+                    AsyncImage(
+                        model = uiState.profileImageUri,
+                        contentDescription = "Foto de perfil",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
                     )
-                ) {
+                } else {
                     Icon(
-                        imageVector = Icons.Rounded.Tune,
+                        imageVector = Icons.Outlined.Person,
                         contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        tint = Color.Gray,
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Ver foto de perfil", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
+                        onClick = {
+                            menuExpanded = false
+                            showViewPhotoDialog = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Editar foto de perfil", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
+                        onClick = {
+                            menuExpanded = false
+                            galleryLauncher.launch("image/*")
+                        }
+                    )
+                }
+            }
+
+            Text(
+                text = uiState.profileNombre,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = Color(0xFFE8F5E9),
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF2E7D32))
                     )
                     Text(
-                        text = "Configurar perfil",
+                        text = "Perfil verificado",
+                        style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        color = Color(0xFF2E7D32)
                     )
                 }
+            }
 
+            AppCard(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ProfileInfoRow(
+                        icon = Icons.Outlined.Person,
+                        label = "Nombre y apellido",
+                        value = uiState.profileNombre
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    ProfileInfoRow(
+                        icon = Icons.Outlined.Badge,
+                        label = "RUT",
+                        value = uiState.profileRut
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    ProfileInfoRow(
+                        icon = Icons.Outlined.Phone,
+                        label = "Número de teléfono",
+                        value = uiState.profileTelefono
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { showEditDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryDarkGreen,
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Tune,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
                 Text(
-                    text = "Seguridad industrial · Operación sin conexión",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(top = 8.dp)
+                    text = "Configurar perfil",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
             }
+
+            Text(
+                text = "Seguridad industrial · Operación sin conexión",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+            )
         }
     }
 
@@ -272,13 +254,13 @@ fun PerfilContent(
 
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
-            title = { Text("Configurar Perfil", fontWeight = FontWeight.Bold) },
+            title = { Text("Configurar Perfil", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
                         value = nombreEdit,
                         onValueChange = { nombreEdit = it },
-                        label = { Text("Nombre y apellido") },
+                        label = { Text("Nombre y apellido", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
@@ -286,7 +268,7 @@ fun PerfilContent(
                     OutlinedTextField(
                         value = rutEdit,
                         onValueChange = { rutEdit = it },
-                        label = { Text("RUT") },
+                        label = { Text("RUT", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
@@ -294,7 +276,7 @@ fun PerfilContent(
                     OutlinedTextField(
                         value = telefonoEdit,
                         onValueChange = { telefonoEdit = it },
-                        label = { Text("Número de teléfono") },
+                        label = { Text("Número de teléfono", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
@@ -308,12 +290,12 @@ fun PerfilContent(
                         showEditDialog = false
                     }
                 ) {
-                    Text("Guardar")
+                    Text("Guardar", fontWeight = FontWeight.Bold, color = PrimaryDarkGreen)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showEditDialog = false }) {
-                    Text("Cancelar")
+                    Text("Cancelar", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         )
@@ -322,7 +304,7 @@ fun PerfilContent(
     if (showViewPhotoDialog) {
         AlertDialog(
             onDismissRequest = { showViewPhotoDialog = false },
-            title = { Text("Foto de Perfil", fontWeight = FontWeight.Bold) },
+            title = { Text("Foto de Perfil", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface) },
             text = {
                 Box(
                     modifier = Modifier
@@ -351,7 +333,7 @@ fun PerfilContent(
             },
             confirmButton = {
                 TextButton(onClick = { showViewPhotoDialog = false }) {
-                    Text("Cerrar")
+                    Text("Cerrar", fontWeight = FontWeight.Bold, color = PrimaryDarkGreen)
                 }
             }
         )
@@ -387,14 +369,14 @@ private fun ProfileInfoRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                fontWeight = FontWeight.Bold,
+                color = PrimaryDarkGreen
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = OnBackgroundText
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -404,9 +386,8 @@ private fun ProfileInfoRow(
 @Composable
 fun PerfilScreenPreview() {
     AquaCheckTheme {
-        PerfilContent(
+        PerfilContentInline(
             uiState = PreChequeoUiState(),
-            onBackClick = {},
             onUpdateProfile = { _, _, _ -> },
             onUpdateProfileImageUri = {}
         )
