@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -122,8 +123,8 @@ fun PreChequeoContent(
                 Text(
                     text = "Seleccione los datos para iniciar la verificación pre-inmersión.",
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
 
@@ -147,7 +148,7 @@ fun PreChequeoContent(
                     fechaText = it
                     errorMessage = null
                 },
-                label = { Text("Fecha de Inspección", color = MaterialTheme.colorScheme.onSurface) },
+                label = { Text("Fecha de Inspección", color = Color.Black, fontWeight = FontWeight.Bold) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.CalendarToday,
@@ -159,12 +160,12 @@ fun PreChequeoContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
                     focusedBorderColor = PrimaryDarkGreen,
                     unfocusedBorderColor = PrimaryDarkGreen,
                     focusedLabelColor = PrimaryDarkGreen,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                    unfocusedLabelColor = Color.Black
                 )
             )
 
@@ -243,7 +244,7 @@ private fun <T> DropdownSelectField(
             value = selectedText,
             onValueChange = {},
             readOnly = true,
-            label = { Text(label, color = MaterialTheme.colorScheme.onSurface) },
+            label = { Text(label, color = Color.Black, fontWeight = FontWeight.Bold) },
             leadingIcon = {
                 Icon(
                     imageVector = icon,
@@ -256,12 +257,12 @@ private fun <T> DropdownSelectField(
             },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
                 focusedBorderColor = PrimaryDarkGreen,
                 unfocusedBorderColor = PrimaryDarkGreen,
                 focusedLabelColor = PrimaryDarkGreen,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                unfocusedLabelColor = Color.Black
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -274,7 +275,7 @@ private fun <T> DropdownSelectField(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = optionLabel(option), color = MaterialTheme.colorScheme.onSurface) },
+                    text = { Text(text = optionLabel(option), color = Color.Black, fontWeight = FontWeight.Bold) },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false

@@ -14,13 +14,13 @@ val OnAptoContainerGreen = Color(0xFF12260E)
 val ObservadoRed = Color(0xFFBA1A1A)
 val ObservadoContainerRed = Color(0xFFFFEDEA)
 
-// Surfaces & Backgrounds
+// Surfaces & Backgrounds (High Contrast & Full Opacity)
 val BackgroundLight = Color(0xFFF6F8F4)
 val SurfaceLight = Color(0xFFFFFFFF)
-val OnBackgroundText = Color(0xFF1C1C1C)
-val OnSurfaceText = Color(0xFF1C1C1C)
+val OnBackgroundText = Color(0xFF0F170D)
+val OnSurfaceText = Color(0xFF0F170D)
 
-// Outlines & Variants
+// Outlines & Variants (High Contrast for Outdoor/Industrial Visibility)
 val SurfaceVariantLight = Color(0xFFE2E7DF)
-val OnSurfaceVariantText = Color(0xFF424940)
-val OutlineBorder = Color(0xFF72796F)
+val OnSurfaceVariantText = Color(0xFF1F2B1B)
+val OutlineBorder = Color(0xFF424F3E)

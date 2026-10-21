@@ -40,6 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -69,8 +70,8 @@ import com.example.aquacheck.ui.components.AppTopAppBar
 import com.example.aquacheck.ui.components.PrimaryButton
 import com.example.aquacheck.ui.theme.AquaCheckTheme
 import com.example.aquacheck.ui.theme.BackgroundLight
-import com.example.aquacheck.ui.theme.OnBackgroundText
 import com.example.aquacheck.ui.theme.OutlineBorder
+import com.example.aquacheck.ui.theme.PrimaryDarkGreen
 import com.example.aquacheck.ui.theme.SurfaceLight
 import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
@@ -198,7 +199,7 @@ fun EvidenciasContent(
                 text = "Registra el estado del equipo y el área de trabajo.",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.Black,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -222,8 +223,8 @@ fun EvidenciasContent(
                         Text(
                             text = "No hay evidencias fotográficas registradas.\nPresiona \"Capturar\" para abrir la cámara del teléfono y tomar una foto.",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -255,18 +256,20 @@ fun EvidenciasContent(
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    contentColor = Color.Black
                 ),
-                border = BorderStroke(1.5.dp, OutlineBorder)
+                border = BorderStroke(1.5.dp, PrimaryDarkGreen)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.CameraAlt,
                     contentDescription = null,
+                    tint = PrimaryDarkGreen,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
                     text = "Capturar Evidencia",
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
 
@@ -291,7 +294,8 @@ fun EvidenciasContent(
             title = {
                 Text(
                     text = "Título de Evidencia",
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             },
             text = {
@@ -299,7 +303,8 @@ fun EvidenciasContent(
                     Text(
                         text = "Selecciona o escribe el nombre del equipo o área fotografiada:",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     )
 
                     // Preset tags row 1
@@ -322,7 +327,7 @@ fun EvidenciasContent(
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = Color.Black
                                 )
                             }
                         }
@@ -348,7 +353,7 @@ fun EvidenciasContent(
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = Color.Black
                                 )
                             }
                         }
@@ -359,8 +364,16 @@ fun EvidenciasContent(
                         onValueChange = { evidenciaTitulo = it },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        label = { Text("Nombre / Categoría") },
-                        shape = RoundedCornerShape(12.dp)
+                        label = { Text("Nombre / Categoría", color = Color.Black, fontWeight = FontWeight.Bold) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            focusedBorderColor = PrimaryDarkGreen,
+                            unfocusedBorderColor = PrimaryDarkGreen,
+                            focusedLabelColor = PrimaryDarkGreen,
+                            unfocusedLabelColor = Color.Black
+                        )
                     )
                 }
             },
@@ -385,7 +398,7 @@ fun EvidenciasContent(
                         pendingBitmap = null
                     }
                 ) {
-                    Text("Agregar")
+                    Text("Agregar", fontWeight = FontWeight.Bold, color = PrimaryDarkGreen)
                 }
             },
             dismissButton = {
@@ -395,7 +408,7 @@ fun EvidenciasContent(
                         pendingBitmap = null
                     }
                 ) {
-                    Text("Cancelar")
+                    Text("Cancelar", fontWeight = FontWeight.Bold, color = Color.Black)
                 }
             }
         )
@@ -488,7 +501,7 @@ fun EvidenciaCardItem(
                     text = evidencia.titulo,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = OnBackgroundText,
+                    color = Color.Black,
                     textAlign = TextAlign.Center
                 )
             }

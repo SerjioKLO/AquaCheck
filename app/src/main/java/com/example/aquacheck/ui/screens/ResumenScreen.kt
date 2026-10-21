@@ -56,7 +56,6 @@ import com.example.aquacheck.ui.theme.AptoContainerGreen
 import com.example.aquacheck.ui.theme.AquaCheckTheme
 import com.example.aquacheck.ui.theme.BackgroundLight
 import com.example.aquacheck.ui.theme.OnAptoContainerGreen
-import com.example.aquacheck.ui.theme.OnBackgroundText
 import com.example.aquacheck.ui.theme.ObservadoContainerRed
 import com.example.aquacheck.ui.theme.ObservadoRed
 import com.example.aquacheck.ui.theme.OutlineBorder
@@ -225,8 +224,8 @@ fun ResumenContent(
                         Text(
                             text = item.nombre,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
                             modifier = Modifier.weight(1f)
                         )
                         val statusString = when (item.estado) {
@@ -268,8 +267,8 @@ fun ResumenContent(
                     Text(
                         text = "No se adjuntaron evidencias fotográficas.",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     )
                 } else {
                     LazyRow(
@@ -342,7 +341,7 @@ private fun EvidenciaThumbItem(
                 modifier = Modifier.padding(6.dp),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = OnBackgroundText,
+                color = Color.Black,
                 textAlign = TextAlign.Center
             )
         }
@@ -358,14 +357,14 @@ private fun DetailItem(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.Bold,
+            color = PrimaryDarkGreen
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
     }
 }

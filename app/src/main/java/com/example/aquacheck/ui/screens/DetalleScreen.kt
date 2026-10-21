@@ -54,7 +54,6 @@ import com.example.aquacheck.ui.theme.AptoContainerGreen
 import com.example.aquacheck.ui.theme.AquaCheckTheme
 import com.example.aquacheck.ui.theme.BackgroundLight
 import com.example.aquacheck.ui.theme.OnAptoContainerGreen
-import com.example.aquacheck.ui.theme.OnBackgroundText
 import com.example.aquacheck.ui.theme.ObservadoContainerRed
 import com.example.aquacheck.ui.theme.ObservadoRed
 import com.example.aquacheck.ui.theme.OutlineBorder
@@ -110,7 +109,8 @@ fun DetalleContent(
                 Text(
                     text = "Cargando detalle de evaluación...",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
         } else {
@@ -184,7 +184,8 @@ fun DetalleContent(
                         Text(
                             text = "Todos los ítems del checklist cumplen satisfactoriamente.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
                         )
                     } else {
                         Text(
@@ -205,8 +206,8 @@ fun DetalleContent(
                                 Text(
                                     text = "• ${item.nombre}",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black,
                                     modifier = Modifier.weight(1f)
                                 )
                                 StatusChip(
@@ -229,7 +230,8 @@ fun DetalleContent(
                     Text(
                         text = if (chequeo.observaciones.isNotBlank()) chequeo.observaciones else "Sin observaciones registradas.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     )
                 }
 
@@ -336,7 +338,8 @@ fun DetalleContent(
                         Text(
                             text = "No se adjuntaron evidencias fotográficas en esta evaluación.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
                         )
                     } else {
                         LazyRow(
@@ -362,14 +365,14 @@ private fun DetailRow(
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            fontWeight = FontWeight.Bold,
+            color = PrimaryDarkGreen
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
     }
 }
@@ -382,7 +385,7 @@ private fun MedicalParamRow(
     alertMessage: String
 ) {
     val containerColor = if (isAlert) ObservadoContainerRed else Color.Transparent
-    val textColor = if (isAlert) ObservadoRed else MaterialTheme.colorScheme.onSurface
+    val textColor = if (isAlert) ObservadoRed else Color.Black
 
     Row(
         modifier = Modifier
@@ -396,7 +399,7 @@ private fun MedicalParamRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 color = textColor
             )
             if (isAlert) {
@@ -404,7 +407,7 @@ private fun MedicalParamRow(
                     text = alertMessage,
                     style = MaterialTheme.typography.bodySmall,
                     color = ObservadoRed,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -465,7 +468,7 @@ private fun DetalleEvidenciaItem(
                 modifier = Modifier.padding(6.dp),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = OnBackgroundText,
+                color = Color.Black,
                 textAlign = TextAlign.Center
             )
         }

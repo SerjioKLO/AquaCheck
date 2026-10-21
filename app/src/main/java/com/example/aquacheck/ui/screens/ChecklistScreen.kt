@@ -41,6 +41,7 @@ import com.example.aquacheck.ui.theme.AptoContainerGreen
 import com.example.aquacheck.ui.theme.AquaCheckTheme
 import com.example.aquacheck.ui.theme.BackgroundLight
 import com.example.aquacheck.ui.theme.OnAptoContainerGreen
+import com.example.aquacheck.ui.theme.OnBackgroundText
 import com.example.aquacheck.ui.theme.ObservadoContainerRed
 import com.example.aquacheck.ui.theme.ObservadoRed
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
@@ -109,7 +110,8 @@ fun ChecklistContent(
                 Text(
                     text = "Centro: ${uiState.currentCentro?.nombre ?: "Sin asignar"} | Fecha: ${uiState.currentDate}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontWeight = FontWeight.SemiBold,
+                    color = OnBackgroundText
                 )
             }
 
@@ -156,7 +158,8 @@ private fun ChecklistItemCard(
         Text(
             text = item.nombre,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = OnBackgroundText
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -181,7 +184,8 @@ private fun ChecklistItemCard(
                             fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
-                            fontWeight = if (isCumple) FontWeight.Bold else FontWeight.Normal
+                            fontWeight = if (isCumple) FontWeight.Bold else FontWeight.SemiBold,
+                            color = if (isCumple) OnAptoContainerGreen else OnBackgroundText
                         )
                     }
                 },
@@ -208,7 +212,8 @@ private fun ChecklistItemCard(
                             fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
-                            fontWeight = if (isObservado) FontWeight.Bold else FontWeight.Normal
+                            fontWeight = if (isObservado) FontWeight.Bold else FontWeight.SemiBold,
+                            color = if (isObservado) ObservadoRed else OnBackgroundText
                         )
                     }
                 },
@@ -235,7 +240,8 @@ private fun ChecklistItemCard(
                             fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
-                            fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.Normal
+                            fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.SemiBold,
+                            color = if (isNoCumple) ObservadoRed else OnBackgroundText
                         )
                     }
                 },

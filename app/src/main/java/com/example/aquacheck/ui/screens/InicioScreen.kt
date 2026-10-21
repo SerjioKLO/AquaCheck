@@ -54,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -193,7 +194,7 @@ fun InicioContent(
                             Text(
                                 text = "Sincronizando...",
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Bold,
                                 color = PrimaryDarkGreen
                             )
                             Text(
@@ -265,7 +266,7 @@ fun InicioContent(
                             OutlinedTextField(
                                 value = uiState.searchQuery,
                                 onValueChange = onSearchQueryChange,
-                                label = { Text("Buscar", color = MaterialTheme.colorScheme.onSurface) },
+                                label = { Text("Buscar", color = Color.Black, fontWeight = FontWeight.SemiBold) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Rounded.Search,
@@ -288,7 +289,7 @@ fun InicioContent(
                                         ) {
                                             listOf("Todos", "Apto", "Observado").forEach { filter ->
                                                 DropdownMenuItem(
-                                                    text = { Text(text = "$filter", color = MaterialTheme.colorScheme.onSurface) },
+                                                    text = { Text(text = "$filter", color = Color.Black, fontWeight = FontWeight.Bold) },
                                                     onClick = {
                                                         onFilterSelected(filter)
                                                         filterMenuExpanded = false
@@ -302,12 +303,12 @@ fun InicioContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
                                     focusedBorderColor = PrimaryDarkGreen,
                                     unfocusedBorderColor = PrimaryDarkGreen,
                                     focusedLabelColor = PrimaryDarkGreen,
-                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                                    unfocusedLabelColor = Color.Black
                                 )
                             )
                         }
@@ -345,8 +346,8 @@ private fun HistorialTab(
             Text(
                 text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
         }
     } else {
@@ -396,19 +397,19 @@ private fun PreChequeoCard(
             text = "Buzo: ${preChequeo.buzo.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
         Text(
             text = "Supervisor: ${preChequeo.supervisor.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
         )
         Text(
             text = "Centro: ${preChequeo.centro.nombre}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
         )
     }
 }

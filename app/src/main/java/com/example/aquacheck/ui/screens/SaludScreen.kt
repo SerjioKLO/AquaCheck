@@ -140,7 +140,8 @@ fun SaludContent(
                 Text(
                     text = "Ingrese cada parámetro fisiológico en los campos correspondientes.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
 
@@ -172,6 +173,7 @@ fun SaludContent(
                             Text(
                                 text = "Por favor rellenar todos los campos para validar aptitud.",
                                 style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
                                 color = Color(0xFFE65100)
                             )
                         }
@@ -212,7 +214,7 @@ fun SaludContent(
                             Text(
                                 text = "• $mensaje",
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Bold,
                                 color = ObservadoRed
                             )
                         }
@@ -245,6 +247,7 @@ fun SaludContent(
                             Text(
                                 text = "Todos los parámetros médicos dentro del rango permitido.",
                                 style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
                                 color = OnAptoContainerGreen
                             )
                         }
@@ -395,8 +398,8 @@ private fun NumericInputField(
                 onValueChange(newValue)
             }
         },
-        label = { Text(label, color = MaterialTheme.colorScheme.onSurface) },
-        placeholder = { Text(placeholder, color = Color.Gray) },
+        label = { Text(label, color = Color.Black, fontWeight = FontWeight.Bold) },
+        placeholder = { Text(placeholder, color = Color.DarkGray, fontWeight = FontWeight.Bold) },
         leadingIcon = {
             Icon(
                 imageVector = icon,
@@ -409,12 +412,12 @@ private fun NumericInputField(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
             focusedBorderColor = PrimaryDarkGreen,
             unfocusedBorderColor = PrimaryDarkGreen,
             focusedLabelColor = PrimaryDarkGreen,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+            unfocusedLabelColor = Color.Black
         )
     )
 }
@@ -435,7 +438,7 @@ private fun BooleanSelectionRow(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -447,8 +450,9 @@ private fun BooleanSelectionRow(
                 label = {
                     Text(
                         text = positiveLabel,
-                        fontWeight = if (selectedValue) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = 13.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = if (selectedValue) MaterialTheme.colorScheme.onPrimary else Color.Black
                     )
                 },
                 modifier = Modifier.weight(1f),
@@ -463,8 +467,9 @@ private fun BooleanSelectionRow(
                 label = {
                     Text(
                         text = negativeLabel,
-                        fontWeight = if (!selectedValue) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = 13.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = if (!selectedValue) MaterialTheme.colorScheme.onPrimary else Color.Black
                     )
                 },
                 modifier = Modifier.weight(1f),
