@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,18 +31,42 @@ fun StatusChip(
     status: String,
     modifier: Modifier = Modifier
 ) {
-    val isApto = status.equals("APTO", ignoreCase = true)
+    val cleanStatus = status.trim().lowercase()
 
-    val containerColor = if (isApto) AptoContainerGreen else ObservadoContainerRed
-    val contentColor = if (isApto) OnAptoContainerGreen else ObservadoRed
-    val icon = if (isApto) Icons.Rounded.CheckCircle else Icons.Rounded.Warning
-    val displayText = if (isApto) "Apto" else "Observado"
+    val isPositive = cleanStatus == "apto" || cleanStatus == "cumple" || cleanStatus == "apto / cumple"
+    val isWarning = cleanStatus == "observado" || cleanStatus == "atención" || cleanStatus == "atencion"
+    val isNegative = cleanStatus.contains("no cumple") || cleanStatus.contains("inhabilitado") || cleanStatus.contains("requiere revisión") || cleanStatus.contains("requiere revision") || cleanStatus.contains("crítica") || cleanStatus.contains("critica")
+    val isNoAplica = cleanStatus == "no aplica" || cleanStatus == "n/a"
+
+    val containerColor = when {
+        isPositive -> AptoContainerGreen
+        isWarning -> ObservadoContainerRed
+        isNegative -> ObservadoContainerRed
+        isNoAplica -> Color(0xFFE2E8F0)
+        else -> AptoContainerGreen
+    }
+
+    val contentColor = when {
+        isPositive -> OnAptoContainerGreen
+        isWarning -> ObservadoRed
+        isNegative -> ObservadoRed
+        isNoAplica -> androidx.compose.ui.graphics.Color(0xFF475569)
+        else -> OnAptoContainerGreen
+    }
+
+    val icon = when {
+        isPositive -> Icons.Rounded.CheckCircle
+        isWarning || isNegative -> Icons.Rounded.Warning
+        else -> Icons.Rounded.CheckCircle
+    }
+
+    val displayText = status.ifBlank { "Apto" }
 
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(containerColor)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -49,12 +74,12 @@ fun StatusChip(
             imageVector = icon,
             contentDescription = displayText,
             tint = contentColor,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(16.dp)
         )
         Text(
             text = displayText,
             color = contentColor,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold
         )
     }
