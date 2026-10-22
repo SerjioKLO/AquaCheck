@@ -2,7 +2,6 @@ package com.example.aquacheck.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,21 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Hotel
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocalBar
 import androidx.compose.material.icons.outlined.MonitorHeart
 import androidx.compose.material.icons.outlined.Speed
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -35,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -49,12 +43,8 @@ import com.example.aquacheck.model.MockData
 import com.example.aquacheck.ui.components.AppCard
 import com.example.aquacheck.ui.components.AppTopAppBar
 import com.example.aquacheck.ui.components.PrimaryButton
-import com.example.aquacheck.ui.theme.AptoContainerGreen
 import com.example.aquacheck.ui.theme.AquaCheckTheme
 import com.example.aquacheck.ui.theme.BackgroundLight
-import com.example.aquacheck.ui.theme.OnAptoContainerGreen
-import com.example.aquacheck.ui.theme.ObservadoContainerRed
-import com.example.aquacheck.ui.theme.ObservadoRed
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
 import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
@@ -104,13 +94,6 @@ fun SaludContent(
     onContinuarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val hasBlankFields = uiState.frecuenciaCardiacaText.isBlank() ||
-        uiState.sistolicaText.isBlank() ||
-        uiState.diastolicaText.isBlank() ||
-        uiState.saturacionText.isBlank() ||
-        uiState.horasSuenoText.isBlank() ||
-        uiState.horasUltimoAlcoholText.isBlank()
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -143,116 +126,6 @@ fun SaludContent(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-            }
-
-            // Live Banner Status Handling
-            if (hasBlankFields) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFF3E0), shape = RoundedCornerShape(16.dp))
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = null,
-                            tint = Color(0xFFE65100),
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Column {
-                            Text(
-                                text = "EVALUACIÓN PENDIENTE DE INGRESO",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE65100)
-                            )
-                            Text(
-                                text = "Por favor rellenar todos los campos para validar aptitud.",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE65100)
-                            )
-                        }
-                    }
-                }
-            } else if (!uiState.saludApto) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(ObservadoContainerRed, shape = RoundedCornerShape(16.dp))
-                        .padding(16.dp)
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Warning,
-                                contentDescription = null,
-                                tint = ObservadoRed,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = "INHABILITADO / REQUIERE REVISIÓN",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = ObservadoRed
-                            )
-                        }
-                        Text(
-                            text = "Criterios médicos no cumplidos:",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = ObservadoRed
-                        )
-                        uiState.mensajesValidacionSalud.forEach { mensaje ->
-                            Text(
-                                text = "• $mensaje",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = ObservadoRed
-                            )
-                        }
-                    }
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(AptoContainerGreen, shape = RoundedCornerShape(16.dp))
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = null,
-                            tint = OnAptoContainerGreen,
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Column {
-                            Text(
-                                text = "EVALUACIÓN MÉDICA: APTO",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = OnAptoContainerGreen
-                            )
-                            Text(
-                                text = "Todos los parámetros médicos dentro del rango permitido.",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = OnAptoContainerGreen
-                            )
-                        }
-                    }
-                }
             }
 
             // Section 1: Signos Vitales

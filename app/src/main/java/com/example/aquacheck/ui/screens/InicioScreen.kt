@@ -1,5 +1,6 @@
 package com.example.aquacheck.ui.screens
 
+import android.app.DatePickerDialog
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -24,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.CalendarToday
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Search
@@ -55,11 +58,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
 import com.example.aquacheck.model.RolUsuario
 import com.example.aquacheck.ui.components.AppCard
@@ -76,6 +80,8 @@ import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun InicioScreen(
@@ -118,12 +124,27 @@ fun InicioContent(
     onUpdateProfileImageUri: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     var isSyncing by remember { mutableStateOf(false) }
     var syncProgress by remember { mutableFloatStateOf(0f) }
     var filterMenuExpanded by remember { mutableStateOf(false) }
+
+    val datePickerDialog = remember(context) {
+        val cal = Calendar.getInstance()
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                val formattedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                onSearchQueryChange(formattedDate)
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        )
+    }
 
     val navigationTabs = listOf(
         NavigationTab("Historial", Icons.Rounded.History),
@@ -278,27 +299,48 @@ fun InicioContent(
                                     )
                                 },
                                 trailingIcon = {
-                                    Box {
-                                        IconButton(onClick = { filterMenuExpanded = true }) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(0.dp)
+                                    ) {
+                                        if (uiState.searchQuery.isNotBlank()) {
+                                            IconButton(onClick = { onSearchQueryChange("") }) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Close,
+                                                    contentDescription = "Limpiar búsqueda",
+                                                    tint = Color.Gray
+                                                )
+                                            }
+                                        }
+                                        IconButton(onClick = { datePickerDialog.show() }) {
                                             Icon(
-                                                imageVector = Icons.Rounded.FilterList,
-                                                contentDescription = "Filtrar por estado",
+                                                imageVector = Icons.Rounded.CalendarToday,
+                                                contentDescription = "Filtrar por fecha",
                                                 tint = PrimaryDarkGreen
                                             )
                                         }
-                                        DropdownMenu(
-                                            expanded = filterMenuExpanded,
-                                            onDismissRequest = { filterMenuExpanded = false },
-                                            containerColor = Color.White
-                                        ) {
-                                            listOf("Todos", "Apto", "Observado").forEach { filter ->
-                                                DropdownMenuItem(
-                                                    text = { Text(text = "$filter", color = Color.Black, fontWeight = FontWeight.Bold) },
-                                                    onClick = {
-                                                        onFilterSelected(filter)
-                                                        filterMenuExpanded = false
-                                                    }
+                                        Box {
+                                            IconButton(onClick = { filterMenuExpanded = true }) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.FilterList,
+                                                    contentDescription = "Filtrar por estado",
+                                                    tint = PrimaryDarkGreen
                                                 )
+                                            }
+                                            DropdownMenu(
+                                                expanded = filterMenuExpanded,
+                                                onDismissRequest = { filterMenuExpanded = false },
+                                                containerColor = Color.White
+                                            ) {
+                                                listOf("Todos", "Apto", "Observado").forEach { filter ->
+                                                    DropdownMenuItem(
+                                                        text = { Text(text = filter, color = Color.Black, fontWeight = FontWeight.Bold) },
+                                                        onClick = {
+                                                            onFilterSelected(filter)
+                                                            filterMenuExpanded = false
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -352,14 +394,17 @@ private fun HistorialTab(
 ) {
     if (preChequeos.isEmpty()) {
         Box(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+                fontWeight = FontWeight.Normal,
+                color = Color.Black,
+                textAlign = TextAlign.Center
             )
         }
     } else {
@@ -431,7 +476,7 @@ private fun PreChequeoCard(
 fun InicioScreenPreview() {
     AquaCheckTheme {
         InicioContent(
-            uiState = PreChequeoUiState(preChequeos = MockData.mockPreChequeos),
+            uiState = PreChequeoUiState(preChequeos = emptyList()),
             onSearchQueryChange = {},
             onFilterSelected = {},
             onNewPreChequeoClick = {},

@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.aquacheck.data.AppDatabase
 import com.example.aquacheck.data.PreChequeoRepository
-import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,12 +36,7 @@ class DetalleViewModel(
     fun cargarDetalle(id: String) {
         viewModelScope.launch {
             val entity = repository.getPreChequeoById(id)
-            if (entity != null) {
-                _chequeo.value = entity
-            } else {
-                val mock = MockData.mockPreChequeos.find { it.id == id }
-                _chequeo.value = mock ?: MockData.mockPreChequeos.firstOrNull()
-            }
+            _chequeo.value = entity
         }
     }
 }

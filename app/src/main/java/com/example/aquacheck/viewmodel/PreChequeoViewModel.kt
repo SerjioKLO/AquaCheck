@@ -37,7 +37,7 @@ open class PreChequeoViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         PreChequeoUiState(
-            preChequeos = MockData.mockPreChequeos,
+            preChequeos = emptyList(),
             currentBuzo = MockData.mockBuzos.firstOrNull(),
             currentSupervisor = MockData.mockSupervisores.firstOrNull(),
             currentCentro = MockData.mockCentros.firstOrNull(),
@@ -58,16 +58,10 @@ open class PreChequeoViewModel : ViewModel() {
             val repo = PreChequeoRepository(dao)
             repository = repo
             viewModelScope.launch {
+                repo.deletePreChequeo("pc1")
+                repo.deletePreChequeo("pc2")
                 repo.getAllPreChequeos().collectLatest { list ->
-                    val preChequeosList = if (list.isEmpty()) {
-                        MockData.mockPreChequeos.forEach { mock ->
-                            repo.insertPreChequeo(mock)
-                        }
-                        MockData.mockPreChequeos
-                    } else {
-                        list
-                    }
-                    _uiState.update { it.copy(preChequeos = preChequeosList) }
+                    _uiState.update { it.copy(preChequeos = list) }
                 }
             }
         } catch (e: Exception) {

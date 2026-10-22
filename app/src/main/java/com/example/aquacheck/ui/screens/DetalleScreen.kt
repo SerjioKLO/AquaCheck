@@ -45,7 +45,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.aquacheck.model.EstadoItem
 import com.example.aquacheck.model.EvidenciaItem
-import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
 import com.example.aquacheck.ui.components.AppCard
 import com.example.aquacheck.ui.components.AppTopAppBar
@@ -169,7 +168,7 @@ fun DetalleContent(
                 // Sección 1: Fallas y Observaciones del Checklist (Filtro Crítico)
                 AppCard(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Sección 1: Checklist y Hallazgos Críticos",
+                        text = "Checklist y Hallazgos Críticos",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryDarkGreen
@@ -184,14 +183,12 @@ fun DetalleContent(
                         Text(
                             text = "Todos los ítems del checklist cumplen satisfactoriamente.",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
                     } else {
                         Text(
                             text = "Ítems con observaciones o no cumple:",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
                             color = ObservadoRed
                         )
                         Spacer(modifier = Modifier.height(4.dp))
@@ -230,7 +227,6 @@ fun DetalleContent(
                     Text(
                         text = if (chequeo.observaciones.isNotBlank()) chequeo.observaciones else "Sin observaciones registradas.",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                 }
@@ -238,7 +234,7 @@ fun DetalleContent(
                 // Sección 2: Parámetros Médicos de Salud
                 AppCard(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Sección 2: Parámetros Médicos de Salud",
+                        text = "Parámetros Médicos de Salud",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryDarkGreen
@@ -319,13 +315,15 @@ fun DetalleContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Sección 3: Evidencias Fotográficas",
+                            text = "Evidencias Fotográficas",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryDarkGreen
+                            color = PrimaryDarkGreen,
+                            modifier = Modifier.weight(1f)
                         )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "${chequeo.evidencias.size} fotos",
+                            text = "${chequeo.evidencias.size} ${if (chequeo.evidencias.size == 1) "foto" else "fotos"}",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = PrimaryDarkGreen
@@ -338,7 +336,6 @@ fun DetalleContent(
                         Text(
                             text = "No se adjuntaron evidencias fotográficas en esta evaluación.",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
                     } else {
@@ -385,7 +382,8 @@ private fun MedicalParamRow(
     alertMessage: String
 ) {
     val containerColor = if (isAlert) ObservadoContainerRed else Color.Transparent
-    val textColor = if (isAlert) ObservadoRed else Color.Black
+    val labelColor = if (isAlert) ObservadoRed else Color.Black
+    val valueColor = if (isAlert) ObservadoRed else Color.Black
 
     Row(
         modifier = Modifier
@@ -399,15 +397,15 @@ private fun MedicalParamRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = textColor
+                fontWeight = FontWeight.Medium,
+                color = labelColor
             )
             if (isAlert) {
                 Text(
                     text = alertMessage,
                     style = MaterialTheme.typography.bodySmall,
                     color = ObservadoRed,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Normal
                 )
             }
         }
@@ -415,7 +413,7 @@ private fun MedicalParamRow(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = textColor
+            color = valueColor
         )
     }
 }
@@ -480,7 +478,7 @@ private fun DetalleEvidenciaItem(
 fun DetalleScreenPreview() {
     AquaCheckTheme {
         DetalleContent(
-            chequeo = MockData.mockPreChequeos[1],
+            chequeo = null,
             onBackClick = {}
         )
     }

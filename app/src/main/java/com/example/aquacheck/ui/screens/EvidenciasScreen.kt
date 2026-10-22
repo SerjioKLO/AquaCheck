@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -116,6 +114,8 @@ fun EvidenciasContent(
     val context = LocalContext.current
     var pendingBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
+    var showPermissionDeniedDialog by remember { mutableStateOf(false) }
+    var showCameraErrorDialog by remember { mutableStateOf(false) }
     var evidenciaTitulo by remember { mutableStateOf("") }
 
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -131,12 +131,14 @@ fun EvidenciasContent(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        try {
-            cameraLauncher.launch(null)
-        } catch (e: Exception) {
-            pendingBitmap = createSampleBitmap()
-            evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-            showCategoryDialog = true
+        if (isGranted) {
+            try {
+                cameraLauncher.launch(null)
+            } catch (e: Exception) {
+                showCameraErrorDialog = true
+            }
+        } else {
+            showPermissionDeniedDialog = true
         }
     }
 
@@ -150,18 +152,10 @@ fun EvidenciasContent(
             try {
                 cameraLauncher.launch(null)
             } catch (e: Exception) {
-                pendingBitmap = createSampleBitmap()
-                evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-                showCategoryDialog = true
+                showCameraErrorDialog = true
             }
         } else {
-            try {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            } catch (e: Exception) {
-                pendingBitmap = createSampleBitmap()
-                evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-                showCategoryDialog = true
-            }
+            permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
@@ -413,6 +407,60 @@ fun EvidenciasContent(
             }
         )
     }
+
+    if (showPermissionDeniedDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDeniedDialog = false },
+            title = {
+                Text(
+                    text = "Permiso de Cámara Denegado",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            },
+            text = {
+                Text(
+                    text = "No se pueden adjuntar evidencias fotográficas sin acceso a la cámara. Por favor, concede el permiso de cámara en la configuración para capturar fotografías del equipo.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showPermissionDeniedDialog = false }
+                ) {
+                    Text("Entendido", fontWeight = FontWeight.Bold, color = PrimaryDarkGreen)
+                }
+            }
+        )
+    }
+
+    if (showCameraErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showCameraErrorDialog = false },
+            title = {
+                Text(
+                    text = "Cámara No Disponible",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            },
+            text = {
+                Text(
+                    text = "No se pudo acceder a la cámara en este dispositivo.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showCameraErrorDialog = false }
+                ) {
+                    Text("Entendido", fontWeight = FontWeight.Bold, color = PrimaryDarkGreen)
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -507,25 +555,6 @@ fun EvidenciaCardItem(
             }
         }
     }
-}
-
-private fun createSampleBitmap(): Bitmap {
-    val bitmap = Bitmap.createBitmap(400, 300, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bitmap)
-    val paint = Paint().apply {
-        color = android.graphics.Color.rgb(18, 38, 14)
-        isAntiAlias = true
-    }
-    canvas.drawRect(0f, 0f, 400f, 300f, paint)
-
-    val textPaint = Paint().apply {
-        color = android.graphics.Color.WHITE
-        textSize = 28f
-        isAntiAlias = true
-        textAlign = Paint.Align.CENTER
-    }
-    canvas.drawText("Foto Capturada", 200f, 150f, textPaint)
-    return bitmap
 }
 
 private fun saveBitmapToSystemStorage(context: Context, bitmap: Bitmap): String {
