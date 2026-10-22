@@ -130,7 +130,7 @@ fun PreChequeoContent(
 
             // Centro Selection
             DropdownSelectField(
-                label = "Centro de Cultivo / Operación",
+                label = "Centro de Operación",
                 selectedText = selectedCentro?.nombre ?: "Seleccionar Centro",
                 icon = Icons.Rounded.Place,
                 options = MockData.mockCentros,
@@ -141,14 +141,55 @@ fun PreChequeoContent(
                 }
             )
 
-            // Fecha Text Field
+            // Buzo Selection
+            DropdownSelectField(
+                label = "Buzo",
+                selectedText = selectedBuzo?.nombre ?: "Seleccionar Buzo",
+                icon = Icons.Rounded.Badge,
+                options = MockData.mockBuzos,
+                optionLabel = { "${it.nombre} (${it.certificacion})" },
+                onOptionSelected = {
+                    selectedBuzo = it
+                    errorMessage = null
+                }
+            )
+
+            // Supervisor (Automático, tomado de la sesión)
+            val supervisorActualNombre = uiState.currentUser?.nombre 
+                ?: uiState.currentSupervisor?.nombre 
+                ?: "Carlos Mendoza"
+            
+            OutlinedTextField(
+                value = supervisorActualNombre,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Supervisor (Automático - Sesión Activa)", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.SupervisorAccount,
+                        contentDescription = null,
+                        tint = PrimaryDarkGreen
+                    )
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedBorderColor = PrimaryDarkGreen,
+                    unfocusedBorderColor = PrimaryDarkGreen,
+                    focusedLabelColor = PrimaryDarkGreen,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                )
+            )
+
+            // Fecha / Hora Automática (dd-MM-yyyy HH:mm)
             OutlinedTextField(
                 value = fechaText,
-                onValueChange = {
-                    fechaText = it
-                    errorMessage = null
-                },
-                label = { Text("Fecha de Inspección", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Fecha y Hora (Automática)", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.CalendarToday,
@@ -167,32 +208,6 @@ fun PreChequeoContent(
                     focusedLabelColor = PrimaryDarkGreen,
                     unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
                 )
-            )
-
-            // Buzo Selection
-            DropdownSelectField(
-                label = "Buzo Inspeccionado",
-                selectedText = selectedBuzo?.nombre ?: "Seleccionar Buzo",
-                icon = Icons.Rounded.Badge,
-                options = MockData.mockBuzos,
-                optionLabel = { "${it.nombre} (${it.certificacion})" },
-                onOptionSelected = {
-                    selectedBuzo = it
-                    errorMessage = null
-                }
-            )
-
-            // Supervisor Selection
-            DropdownSelectField(
-                label = "Supervisor Responsable",
-                selectedText = selectedSupervisor?.nombre ?: "Seleccionar Supervisor",
-                icon = Icons.Rounded.SupervisorAccount,
-                options = MockData.mockSupervisores,
-                optionLabel = { it.nombre },
-                onOptionSelected = {
-                    selectedSupervisor = it
-                    errorMessage = null
-                }
             )
 
             if (errorMessage != null) {

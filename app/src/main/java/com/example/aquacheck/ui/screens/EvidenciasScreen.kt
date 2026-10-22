@@ -1,11 +1,12 @@
 package com.example.aquacheck.ui.screens
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -31,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -62,7 +64,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.aquacheck.model.EvidenciaItem
@@ -115,53 +116,35 @@ fun EvidenciasContent(
 ) {
     val context = LocalContext.current
     var pendingBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var pendingUriString by remember { mutableStateOf<String?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
     var evidenciaTitulo by remember { mutableStateOf("") }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                // Fallback if persistable permission fails
+            }
+
+            val bitmap = try {
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    BitmapFactory.decodeStream(stream)
+                }
+            } catch (e: Exception) {
+                null
+            }
+
+            pendingUriString = uri.toString()
             pendingBitmap = bitmap
             evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
             showCategoryDialog = true
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        try {
-            cameraLauncher.launch(null)
-        } catch (e: Exception) {
-            pendingBitmap = createSampleBitmap()
-            evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-            showCategoryDialog = true
-        }
-    }
-
-    fun launchCamera() {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasPermission) {
-            try {
-                cameraLauncher.launch(null)
-            } catch (e: Exception) {
-                pendingBitmap = createSampleBitmap()
-                evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-                showCategoryDialog = true
-            }
-        } else {
-            try {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            } catch (e: Exception) {
-                pendingBitmap = createSampleBitmap()
-                evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-                showCategoryDialog = true
-            }
         }
     }
 
@@ -169,7 +152,7 @@ fun EvidenciasContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppTopAppBar(
-                title = "Evidencias",
+                title = "Evidencias Fotográficas",
                 onBackClick = onBackClick
             )
         },
@@ -181,7 +164,7 @@ fun EvidenciasContent(
                     .padding(16.dp)
             ) {
                 PrimaryButton(
-                    text = "Siguiente",
+                    text = "Siguiente a Resumen",
                     onClick = onSiguienteClick,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -196,7 +179,7 @@ fun EvidenciasContent(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Text(
-                text = "Registra el estado del equipo y el área de trabajo.",
+                text = "Seleccione fotos de la galería para respaldar el pre-chequeo.",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -215,13 +198,13 @@ fun EvidenciasContent(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.CameraAlt,
+                            imageVector = Icons.Outlined.PhotoLibrary,
                             contentDescription = null,
                             tint = OutlineBorder,
                             modifier = Modifier.size(56.dp)
                         )
                         Text(
-                            text = "No hay evidencias fotográficas registradas.\nPresiona \"Capturar\" para abrir la cámara del teléfono y tomar una foto.",
+                            text = "No hay evidencias fotográficas seleccionadas.\nPresione \"Seleccionar de la Galería\" para adjuntar fotos.",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black,
@@ -249,7 +232,7 @@ fun EvidenciasContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedButton(
-                onClick = { launchCamera() },
+                onClick = { galleryLauncher.launch("image/*") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -261,13 +244,13 @@ fun EvidenciasContent(
                 border = BorderStroke(1.5.dp, PrimaryDarkGreen)
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.CameraAlt,
+                    imageVector = Icons.Outlined.PhotoLibrary,
                     contentDescription = null,
                     tint = PrimaryDarkGreen,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
-                    text = "Capturar Evidencia",
+                    text = "Seleccionar de la Galería",
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )

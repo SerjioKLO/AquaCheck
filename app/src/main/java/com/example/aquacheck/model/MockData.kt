@@ -27,18 +27,12 @@ object MockData {
     )
 
     val defaultChecklistItems = listOf(
-        ItemChecklist(id = "1", nombre = "Equipamiento", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "2", nombre = "Compresor", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "3", nombre = "Oxígeno", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "4", nombre = "Señalización", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "5", nombre = "Buzo de emergencia", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "6", nombre = "Condiciones del entorno", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "7", nombre = "Equipamiento del buzo", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "8", nombre = "Compresor disponible y operativo", EstadoItem.CUMPLE),
-        ItemChecklist(id = "9", nombre = "Oxígeno de contingencia", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "10", nombre = "Buzo de emergencia disponible", estado = EstadoItem.CUMPLE),
-        ItemChecklist(id = "11", nombre = "Señalización visible para embarcaciones", esCritico = false),
-        ItemChecklist(id = "12", nombre = "Condiciones del entorno", esCritico = false)
+        ItemChecklist(id = "1", nombre = "Equipamiento del buzo", estado = EstadoItem.CUMPLE, esCritico = true),
+        ItemChecklist(id = "2", nombre = "Compresor disponible y operativo", estado = EstadoItem.CUMPLE, esCritico = true),
+        ItemChecklist(id = "3", nombre = "Oxígeno de contingencia", estado = EstadoItem.CUMPLE, esCritico = true),
+        ItemChecklist(id = "4", nombre = "Buzo de emergencia disponible", estado = EstadoItem.CUMPLE, esCritico = true),
+        ItemChecklist(id = "5", nombre = "Señalización visible para embarcaciones", estado = EstadoItem.CUMPLE, esCritico = false),
+        ItemChecklist(id = "6", nombre = "Condiciones del entorno", estado = EstadoItem.CUMPLE, esCritico = false)
     )
 
     val defaultEvidencias = emptyList<EvidenciaItem>()
