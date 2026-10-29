@@ -35,6 +35,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -104,6 +107,7 @@ fun SaludContent(
     onContinuarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val hasBlankFields = uiState.frecuenciaCardiacaText.isBlank() ||
         uiState.sistolicaText.isBlank() ||
         uiState.diastolicaText.isBlank() ||
@@ -371,12 +375,35 @@ fun SaludContent(
                 )
             }
 
+            val hasBlankFields = uiState.frecuenciaCardiacaText.isBlank() ||
+                uiState.sistolicaText.isBlank() ||
+                uiState.diastolicaText.isBlank() ||
+                uiState.saturacionText.isBlank() ||
+                uiState.horasSuenoText.isBlank() ||
+                uiState.horasUltimoAlcoholText.isBlank()
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             PrimaryButton(
                 text = "Continuar al Checklist",
                 icon = Icons.AutoMirrored.Rounded.ArrowForward,
-                onClick = onContinuarClick,
+                onClick = {
+                    if (hasBlankFields) {
+                        errorMessage = "Por favor complete todos los campos obligatorios de salud para continuar."
+                    } else {
+                        errorMessage = null
+                        onContinuarClick()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }

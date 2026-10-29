@@ -51,7 +51,11 @@ open class PreChequeoViewModel : ViewModel() {
     )
     val uiState: StateFlow<PreChequeoUiState> = _uiState.asStateFlow()
 
+    private var appContext: Context? = null
+
     fun initDatabase(context: Context) {
+        appContext = context.applicationContext
+        initSession(context)
         if (repository != null) return
         try {
             val dao = AppDatabase.getDatabase(context).preChequeoDao()
@@ -75,6 +79,28 @@ open class PreChequeoViewModel : ViewModel() {
         }
     }
 
+    private fun initSession(context: Context) {
+        try {
+            val prefs = context.getSharedPreferences("aquacheck_session", Context.MODE_PRIVATE)
+            val savedUsername = prefs.getString("logged_in_username", null)
+            if (savedUsername != null) {
+                val userObj = MockData.mockUsuarios.find { it.username == savedUsername }
+                if (userObj != null) {
+                    val autoSupervisor = Supervisor(id = userObj.id, nombre = userObj.nombre)
+                    _uiState.update {
+                        it.copy(
+                            currentUser = userObj,
+                            currentSupervisor = autoSupervisor,
+                            profileNombre = userObj.nombre
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Fallback
+        }
+    }
+
     fun login(usuario: String, clave: String): Boolean {
         val cleanUsername = usuario.trim().lowercase()
         val userObj = when {
@@ -88,9 +114,19 @@ open class PreChequeoViewModel : ViewModel() {
         }
 
         return if (userObj != null) {
+            val autoSupervisor = Supervisor(id = userObj.id, nombre = userObj.nombre)
+            try {
+                appContext?.let { ctx ->
+                    val prefs = ctx.getSharedPreferences("aquacheck_session", Context.MODE_PRIVATE)
+                    prefs.edit().putString("logged_in_username", userObj.username).apply()
+                }
+            } catch (e: Exception) {
+                // Fallback
+            }
             _uiState.update {
                 it.copy(
                     currentUser = userObj,
+                    currentSupervisor = autoSupervisor,
                     profileNombre = userObj.nombre
                 )
             }
@@ -101,6 +137,14 @@ open class PreChequeoViewModel : ViewModel() {
     }
 
     fun logout() {
+        try {
+            appContext?.let { ctx ->
+                val prefs = ctx.getSharedPreferences("aquacheck_session", Context.MODE_PRIVATE)
+                prefs.edit().remove("logged_in_username").apply()
+            }
+        } catch (e: Exception) {
+            // Fallback
+        }
         _uiState.update { it.copy(currentUser = null) }
     }
 

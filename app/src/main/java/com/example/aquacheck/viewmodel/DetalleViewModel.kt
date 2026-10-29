@@ -45,4 +45,12 @@ class DetalleViewModel(
             }
         }
     }
+
+    fun eliminarChequeo(onDeleted: () -> Unit) {
+        val currentChequeo = _chequeo.value ?: return
+        viewModelScope.launch {
+            repository.deletePreChequeo(currentChequeo.id)
+            onDeleted()
+        }
+    }
 }
