@@ -1,15 +1,12 @@
 package com.example.aquacheck.ui.screens
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -123,53 +120,6 @@ fun EvidenciasContent(
     var showCategoryDialog by remember { mutableStateOf(false) }
     var evidenciaTitulo by remember { mutableStateOf("") }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
-            pendingBitmap = bitmap
-            evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-            showCategoryDialog = true
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        try {
-            cameraLauncher.launch(null)
-        } catch (e: Exception) {
-            pendingBitmap = createSampleBitmap()
-            evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-            showCategoryDialog = true
-        }
-    }
-
-    fun launchCamera() {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasPermission) {
-            try {
-                cameraLauncher.launch(null)
-            } catch (e: Exception) {
-                pendingBitmap = createSampleBitmap()
-                evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-                showCategoryDialog = true
-            }
-        } else {
-            try {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            } catch (e: Exception) {
-                pendingBitmap = createSampleBitmap()
-                evidenciaTitulo = "Evidencia #${uiState.evidencias.size + 1}"
-                showCategoryDialog = true
-            }
-        }
-    }
-
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -229,7 +179,7 @@ fun EvidenciasContent(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Text(
-                text = "Capture una foto en el momento o seleccione desde la galería para respaldar el pre-chequeo.",
+                text = "Seleccione fotos de la galería para respaldar el pre-chequeo.",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -254,7 +204,7 @@ fun EvidenciasContent(
                             modifier = Modifier.size(56.dp)
                         )
                         Text(
-                            text = "No hay evidencias fotográficas registradas.\nPresione \"Tomar Foto\" o \"Galería\" para agregar fotos.",
+                            text = "No hay evidencias fotográficas seleccionadas.\nPresione \"Seleccionar de la Galería\" para adjuntar fotos.",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black,
@@ -281,61 +231,29 @@ fun EvidenciasContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            OutlinedButton(
+                onClick = { galleryLauncher.launch("image/*") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                ),
+                border = BorderStroke(1.5.dp, PrimaryDarkGreen)
             ) {
-                // Button 1: Cámara
-                OutlinedButton(
-                    onClick = { launchCamera() },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color.Black
-                    ),
-                    border = BorderStroke(1.5.dp, PrimaryDarkGreen)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.CameraAlt,
-                        contentDescription = null,
-                        tint = PrimaryDarkGreen,
-                        modifier = Modifier.padding(end = 6.dp)
-                    )
-                    Text(
-                        text = "Tomar Foto",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                }
-
-                // Button 2: Galería
-                OutlinedButton(
-                    onClick = { galleryLauncher.launch("image/*") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color.Black
-                    ),
-                    border = BorderStroke(1.5.dp, PrimaryDarkGreen)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.PhotoLibrary,
-                        contentDescription = null,
-                        tint = PrimaryDarkGreen,
-                        modifier = Modifier.padding(end = 6.dp)
-                    )
-                    Text(
-                        text = "Galería",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Outlined.PhotoLibrary,
+                    contentDescription = null,
+                    tint = PrimaryDarkGreen,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(
+                    text = "Seleccionar de la Galería",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

@@ -249,51 +249,74 @@ open class PreChequeoViewModel : ViewModel() {
         val state = _uiState.value
         val fallas = mutableListOf<String>()
 
-        val sis = state.sistolicaText.toIntOrNull()
-        val dia = state.diastolicaText.toIntOrNull()
-        val sat = state.saturacionText.toIntOrNull()
-
-        if (sis == null) {
-            fallas.add("Presión Sistólica no ingresada")
-        } else if (sis >= 160) {
-            fallas.add("Presión Sistólica Crítica ($sis mmHg >= 160)")
-        } else if (sis >= 140) {
-            fallas.add("Presión Sistólica en Atención ($sis mmHg >= 140)")
+        if (state.frecuenciaCardiacaText.isBlank()) {
+            fallas.add("Frecuencia Cardíaca: Campo sin ingresar")
+        } else {
+            val fc = state.frecuenciaCardiacaText.toIntOrNull()
+            if (fc == null || fc !in 50..100) {
+                fallas.add("Frecuencia Cardíaca (${fc ?: state.frecuenciaCardiacaText} lpm): debe estar entre 50 y 100 lpm")
+            }
         }
 
-        if (dia == null) {
-            fallas.add("Presión Diastólica no ingresada")
-        } else if (dia >= 100) {
-            fallas.add("Presión Diastólica Crítica ($dia mmHg >= 100)")
-        } else if (dia >= 90) {
-            fallas.add("Presión Diastólica en Atención ($dia mmHg >= 90)")
+        if (state.sistolicaText.isBlank()) {
+            fallas.add("Presión Sistólica: Campo sin ingresar")
+        } else {
+            val sis = state.sistolicaText.toIntOrNull()
+            if (sis == null || sis !in 90..140) {
+                fallas.add("Presión Sistólica (${sis ?: state.sistolicaText} mmHg): debe estar entre 90 y 140 mmHg")
+            }
         }
 
-        if (sat == null) {
-            fallas.add("Saturación O₂ no ingresada")
-        } else if (sat < 92) {
-            fallas.add("Saturación O₂ Crítica ($sat% < 92%)")
-        } else if (sat < 95) {
-            fallas.add("Saturación O₂ en Atención ($sat% < 95%)")
+        if (state.diastolicaText.isBlank()) {
+            fallas.add("Presión Diastólica: Campo sin ingresar")
+        } else {
+            val dia = state.diastolicaText.toIntOrNull()
+            if (dia == null || dia !in 60..90) {
+                fallas.add("Presión Diastólica (${dia ?: state.diastolicaText} mmHg): debe estar entre 60 y 90 mmHg")
+            }
         }
 
-        if (state.durmioMenos6hrs) {
-            fallas.add("Sueño: Durmió menos de 6 horas")
-        }
-        if (state.resfrioDolorOidos) {
-            fallas.add("Síntomas: Resfrío o dolor de oídos")
-        }
-        if (state.consumioAlcohol24hrs) {
-            fallas.add("Alcohol: Consumió alcohol en las últimas 24 horas")
+        if (state.saturacionText.isBlank()) {
+            fallas.add("Saturación SpO2: Campo sin ingresar")
+        } else {
+            val sat = state.saturacionText.toIntOrNull()
+            if (sat == null || sat !in 95..100) {
+                fallas.add("Saturación SpO2 (${sat ?: state.saturacionText}%): debe ser mínimo 95%")
+            }
         }
 
-        val esSaludCritica = (sat != null && sat < 92) || (sis != null && sis >= 160) || (dia != null && dia >= 100)
-        val esApto = !esSaludCritica && fallas.isEmpty()
-        val estadoRes = when {
-            esSaludCritica -> "Requiere revisión"
-            fallas.isNotEmpty() -> "Atención"
-            else -> "Apto"
+        if (state.horasSuenoText.isBlank()) {
+            fallas.add("Horas de Sueño: Campo sin ingresar")
+        } else {
+            val sueno = state.horasSuenoText.toIntOrNull()
+            if (sueno == null || sueno < 6) {
+                fallas.add("Horas de Sueño (${sueno ?: state.horasSuenoText}h): mínimo 6 horas de descanso")
+            }
         }
+
+        if (state.horasUltimoAlcoholText.isBlank()) {
+            fallas.add("Tiempo sin Alcohol: Campo sin ingresar")
+        } else {
+            val alcohol = state.horasUltimoAlcoholText.toIntOrNull()
+            if (alcohol == null || alcohol <= 12) {
+                fallas.add("Consumo de Alcohol (${alcohol ?: state.horasUltimoAlcoholText}h): requiere mínimo 12 horas libre de alcohol")
+            }
+        }
+
+        if (state.tieneCongestionNasal) {
+            fallas.add("Congestión Nasal/Sinusal: Incompatible con inmersión (riesgo de barotrauma)")
+        }
+
+        if (state.tomaMedicamentosNuevos) {
+            fallas.add("Medicamentos Nuevos/Sedantes: Incompatible con buceo")
+        }
+
+        if (!state.estadoPsicologicoCalmo) {
+            fallas.add("Estado Psicológico: Requiere estado calmo y enfocado")
+        }
+
+        val esApto = fallas.isEmpty()
+        val estadoRes = if (esApto) "Apto" else "Inhabilitado / Requiere Revisión"
 
         val res = ResultadoValidacionSalud(
             esApto = esApto,
@@ -304,7 +327,7 @@ open class PreChequeoViewModel : ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 saludApto = esApto,
-                alertaSalud = if (fallas.isEmpty()) null else fallas.joinToString("\n• "),
+                alertaSalud = if (esApto) null else fallas.joinToString("\n• "),
                 mensajesValidacionSalud = fallas
             )
         }
@@ -357,36 +380,28 @@ open class PreChequeoViewModel : ViewModel() {
 
         val validacionSalud = validarSalud()
         val items = currentState.checklistItems
-        val tieneCriticoNoCumple = items.any { it.esCritico && it.estado == EstadoItem.NO_CUMPLE }
-        val tieneAlgunaFallaChecklist = items.any { it.estado == EstadoItem.NO_CUMPLE || it.estado == EstadoItem.OBSERVADO }
-
-        val sis = currentState.sistolicaText.toIntOrNull()
-        val dia = currentState.diastolicaText.toIntOrNull()
-        val sat = currentState.saturacionText.toIntOrNull()
-
-        val esSaludCritica = (sat != null && sat < 92) || (sis != null && sis >= 160) || (dia != null && dia >= 100)
-        val esSaludAtencion = (sat != null && sat < 95) || (sis != null && sis >= 140) || (dia != null && dia >= 90) || currentState.durmioMenos6hrs || currentState.resfrioDolorOidos || currentState.consumioAlcohol24hrs
+        val isChecklistApto = items.all { it.estado == EstadoItem.CUMPLE }
 
         val estadoFinal = when {
-            tieneCriticoNoCumple || esSaludCritica -> "Requiere revisión"
-            tieneAlgunaFallaChecklist || esSaludAtencion -> "Observado"
+            !validacionSalud.esApto -> "Inhabilitado / Requiere Revisión"
+            !isChecklistApto -> "Observado"
             else -> "Apto"
         }
 
-        val cumpleCount = items.count { it.estado == EstadoItem.CUMPLE || it.estado == EstadoItem.NO_APLICA }
+        val cumpleCount = items.count { it.estado == EstadoItem.CUMPLE }
         val noCumpleCount = items.count { it.estado == EstadoItem.NO_CUMPLE }
         val observadoCount = items.count { it.estado == EstadoItem.OBSERVADO }
 
         val resumen = if (estadoFinal == "Apto") {
-            "Salud Normal | Checklist ${cumpleCount}/${items.size} Cumple"
-        } else if (estadoFinal == "Requiere revisión") {
-            "Requiere Revisión (${validacionSalud.observaciones.size} observaciones)"
+            "Salud Apta | ${items.size}/${items.size} Equipamiento Cumple"
+        } else if (!validacionSalud.esApto) {
+            "Salud Inhabilitada (${validacionSalud.observaciones.size} observaciones)"
         } else {
             val partes = mutableListOf<String>()
             if (cumpleCount > 0) partes.add("$cumpleCount Cumple")
             if (observadoCount > 0) partes.add("$observadoCount Observado")
             if (noCumpleCount > 0) partes.add("$noCumpleCount No Cumple")
-            "Observado | " + partes.joinToString(", ")
+            "Salud Apta | " + partes.joinToString(", ")
         }
 
         val resultadoCalculado = Resultado(
