@@ -32,6 +32,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,6 +75,9 @@ fun SaludScreen(
         onSistolicaChange = { viewModel.setSistolica(it) },
         onDiastolicaChange = { viewModel.setDiastolica(it) },
         onSaturacionChange = { viewModel.setSaturacion(it) },
+        onFrecuenciaCardiacaChange = { viewModel.setFrecuenciaCardiaca(it) },
+        onHorasSuenoChange = { viewModel.setHorasSueno(it) },
+        onHorasUltimoAlcoholChange = { viewModel.setHorasUltimoAlcohol(it) },
         onDurmioMenos6hrsChange = { viewModel.setDurmioMenos6hrs(it) },
         onResfrioDolorOidosChange = { viewModel.setResfrioDolorOidos(it) },
         onConsumioAlcohol24hrsChange = { viewModel.setConsumioAlcohol24hrs(it) },
@@ -89,12 +95,17 @@ fun SaludContent(
     onSistolicaChange: (String) -> Unit,
     onDiastolicaChange: (String) -> Unit,
     onSaturacionChange: (String) -> Unit,
+    onFrecuenciaCardiacaChange: (String) -> Unit,
+    onHorasSuenoChange: (String) -> Unit,
+    onHorasUltimoAlcoholChange: (String) -> Unit,
     onDurmioMenos6hrsChange: (Boolean) -> Unit,
     onResfrioDolorOidosChange: (Boolean) -> Unit,
     onConsumioAlcohol24hrsChange: (Boolean) -> Unit,
     onContinuarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -122,7 +133,7 @@ fun SaludContent(
                     color = PrimaryDarkGreen
                 )
                 Text(
-                    text = "Ingrese los 3 parámetros de salud y responda la encuesta para activar el semáforo en vivo.",
+                    text = "Complete todos los parámetros fisiológicos, horas de sueño, alcohol y responda la encuesta para continuar.",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -271,7 +282,7 @@ fun SaludContent(
                 }
             }
 
-            // Section 1: Mediciones Fisiológicas (3 Números)
+            // Section 1: Mediciones Fisiológicas
             AppCard(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "1. Mediciones Fisiológicas",
@@ -283,7 +294,7 @@ fun SaludContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NumericInputField(
-                    label = "Presión Arterial Sistólica (mmHg)",
+                    label = "Presión Arterial Sistólica (mmHg) *",
                     value = uiState.sistolicaText,
                     onValueChange = onSistolicaChange,
                     icon = Icons.Outlined.Speed,
@@ -293,7 +304,7 @@ fun SaludContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NumericInputField(
-                    label = "Presión Arterial Diastólica (mmHg)",
+                    label = "Presión Arterial Diastólica (mmHg) *",
                     value = uiState.diastolicaText,
                     onValueChange = onDiastolicaChange,
                     icon = Icons.Outlined.Speed,
@@ -303,18 +314,58 @@ fun SaludContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NumericInputField(
-                    label = "Saturación de O₂ (%)",
+                    label = "Saturación de O₂ (%) *",
                     value = uiState.saturacionText,
                     onValueChange = onSaturacionChange,
                     icon = Icons.Outlined.MonitorHeart,
                     placeholder = "Ej: 98"
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NumericInputField(
+                    label = "Frecuencia Cardíaca en Reposo (lpm) *",
+                    value = uiState.frecuenciaCardiacaText,
+                    onValueChange = onFrecuenciaCardiacaChange,
+                    icon = Icons.Outlined.MonitorHeart,
+                    placeholder = "Ej: 72"
+                )
             }
 
-            // Section 2: Encuesta de Salud (3 Preguntas)
+            // Section 2: Antecedentes de Sueño y Alcohol
             AppCard(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "2. Encuesta de Salud",
+                    text = "2. Antecedentes y Sueño / Alcohol",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryDarkGreen
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NumericInputField(
+                    label = "Horas de sueño en las últimas 24 hrs *",
+                    value = uiState.horasSuenoText,
+                    onValueChange = onHorasSuenoChange,
+                    icon = Icons.Outlined.Speed,
+                    placeholder = "Ej: 7"
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NumericInputField(
+                    label = "Horas desde el último consumo de alcohol *",
+                    value = uiState.horasUltimoAlcoholText,
+                    onValueChange = onHorasUltimoAlcoholChange,
+                    icon = Icons.Outlined.Speed,
+                    placeholder = "Ej: 48"
+                )
+            }
+
+            // Section 3: Encuesta de Salud (3 Preguntas)
+            AppCard(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "3. Encuesta de Salud",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryDarkGreen
@@ -345,12 +396,34 @@ fun SaludContent(
                 )
             }
 
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             PrimaryButton(
                 text = "Continuar al Checklist",
                 icon = Icons.AutoMirrored.Rounded.ArrowForward,
-                onClick = onContinuarClick,
+                onClick = {
+                    if (uiState.sistolicaText.isBlank() ||
+                        uiState.diastolicaText.isBlank() ||
+                        uiState.saturacionText.isBlank() ||
+                        uiState.frecuenciaCardiacaText.isBlank() ||
+                        uiState.horasSuenoText.isBlank() ||
+                        uiState.horasUltimoAlcoholText.isBlank()
+                    ) {
+                        errorMessage = "Por favor complete todos los campos obligatorios (*): Presión, Saturación, Frecuencia Cardíaca, Horas de Sueño y Horas de Alcohol."
+                    } else {
+                        errorMessage = null
+                        onContinuarClick()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -468,6 +541,9 @@ fun SaludScreenPreview() {
             onSistolicaChange = {},
             onDiastolicaChange = {},
             onSaturacionChange = {},
+            onFrecuenciaCardiacaChange = {},
+            onHorasSuenoChange = {},
+            onHorasUltimoAlcoholChange = {},
             onDurmioMenos6hrsChange = {},
             onResfrioDolorOidosChange = {},
             onConsumioAlcohol24hrsChange = {},
