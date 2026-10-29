@@ -2,10 +2,8 @@ package com.example.aquacheck.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -32,16 +30,6 @@ fun AppNavigation(
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.initDatabase(context)
-    }
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(uiState.currentUser) {
-        if (uiState.currentUser != null && navController.currentDestination?.route == "login") {
-            navController.navigate("inicio") {
-                popUpTo("login") { inclusive = true }
-            }
-        }
     }
 
     NavHost(
