@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.automirrored.rounded.ExitToApp
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -62,6 +63,7 @@ import com.example.aquacheck.viewmodel.PreChequeoViewModel
 @Composable
 fun PerfilScreen(
     viewModel: PreChequeoViewModel,
+    onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,6 +76,10 @@ fun PerfilScreen(
         onUpdateProfileImageUri = { uri ->
             viewModel.updateProfileImageUri(uri)
         },
+        onLogoutClick = {
+            viewModel.logout()
+            onLogoutClick()
+        },
         modifier = modifier
     )
 }
@@ -83,6 +89,7 @@ fun PerfilContentInline(
     uiState: PreChequeoUiState,
     onUpdateProfile: (String, String, String) -> Unit,
     onUpdateProfileImageUri: (String?) -> Unit,
+    onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
@@ -232,6 +239,31 @@ fun PerfilContentInline(
                 )
                 Text(
                     text = "Configurar perfil",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onLogoutClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFD32F2F),
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ExitToApp,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(
+                    text = "Cerrar sesión",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -389,7 +421,8 @@ fun PerfilScreenPreview() {
         PerfilContentInline(
             uiState = PreChequeoUiState(),
             onUpdateProfile = { _, _, _ -> },
-            onUpdateProfileImageUri = {}
+            onUpdateProfileImageUri = {},
+            onLogoutClick = {}
         )
     }
 }

@@ -329,6 +329,7 @@ fun InicioContent(
                         uiState = uiState,
                         onUpdateProfile = onUpdateProfile,
                         onUpdateProfileImageUri = onUpdateProfileImageUri,
+                        onLogoutClick = onLogoutClick,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
