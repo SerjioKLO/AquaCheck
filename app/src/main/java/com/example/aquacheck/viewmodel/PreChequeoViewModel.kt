@@ -11,7 +11,6 @@ import com.example.aquacheck.model.DatosSalud
 import com.example.aquacheck.model.EstadoItem
 import com.example.aquacheck.model.EvidenciaItem
 import com.example.aquacheck.model.MockData
-import com.example.aquacheck.model.NivelSalud
 import com.example.aquacheck.model.PreChequeo
 import com.example.aquacheck.model.Resultado
 import com.example.aquacheck.model.Supervisor
@@ -89,12 +88,9 @@ open class PreChequeoViewModel : ViewModel() {
         }
 
         return if (userObj != null) {
-            val autoSupervisor = Supervisor(id = userObj.id, nombre = userObj.nombre)
             _uiState.update {
                 it.copy(
                     currentUser = userObj,
-                    currentSupervisor = autoSupervisor,
-                    currentDate = getCurrentFormattedDate(),
                     profileNombre = userObj.nombre
                 )
             }
@@ -109,7 +105,7 @@ open class PreChequeoViewModel : ViewModel() {
     }
 
     private fun getCurrentFormattedDate(): String {
-        val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return sdf.format(Date())
     }
 
@@ -150,54 +146,28 @@ open class PreChequeoViewModel : ViewModel() {
                 currentCentro = centro,
                 currentDate = fecha,
                 currentBuzo = buzo,
-                currentSupervisor = supervisor ?: currentState.currentSupervisor
+                currentSupervisor = supervisor
             )
         }
     }
 
-    fun setObservacionesText(text: String) {
-        _uiState.update { it.copy(observacionesText = text) }
-    }
-
     fun setFrecuenciaCardiaca(text: String) {
         _uiState.update { it.copy(frecuenciaCardiacaText = text, resultado = null) }
-        calcularNivelSaludLive()
         validarSalud()
     }
 
     fun setSistolica(text: String) {
         _uiState.update { it.copy(sistolicaText = text, resultado = null) }
-        calcularNivelSaludLive()
         validarSalud()
     }
 
     fun setDiastolica(text: String) {
         _uiState.update { it.copy(diastolicaText = text, resultado = null) }
-        calcularNivelSaludLive()
         validarSalud()
     }
 
     fun setSaturacion(text: String) {
         _uiState.update { it.copy(saturacionText = text, resultado = null) }
-        calcularNivelSaludLive()
-        validarSalud()
-    }
-
-    fun setDurmioMenos6hrs(value: Boolean) {
-        _uiState.update { it.copy(durmioMenos6hrs = value, resultado = null) }
-        calcularNivelSaludLive()
-        validarSalud()
-    }
-
-    fun setResfrioDolorOidos(value: Boolean) {
-        _uiState.update { it.copy(resfrioDolorOidos = value, resultado = null) }
-        calcularNivelSaludLive()
-        validarSalud()
-    }
-
-    fun setConsumioAlcohol24hrs(value: Boolean) {
-        _uiState.update { it.copy(consumioAlcohol24hrs = value, resultado = null) }
-        calcularNivelSaludLive()
         validarSalud()
     }
 
@@ -224,25 +194,6 @@ open class PreChequeoViewModel : ViewModel() {
     fun setEstadoPsicologicoCalmo(value: Boolean) {
         _uiState.update { it.copy(estadoPsicologicoCalmo = value, resultado = null) }
         validarSalud()
-    }
-
-    fun calcularNivelSaludLive() {
-        val state = _uiState.value
-        val sis = state.sistolicaText.toIntOrNull()
-        val dia = state.diastolicaText.toIntOrNull()
-        val sat = state.saturacionText.toIntOrNull()
-
-        val losTresNumerosListos = (sis != null && dia != null && sat != null)
-
-        val nivel = if (losTresNumerosListos) {
-            when {
-                sat!! < 92 || sis!! >= 160 || dia!! >= 100 -> NivelSalud.CRITICA
-                sat < 95 || sis >= 140 || dia >= 90 || state.durmioMenos6hrs || state.resfrioDolorOidos || state.consumioAlcohol24hrs -> NivelSalud.ATENCION
-                else -> NivelSalud.NORMAL
-            }
-        } else null
-
-        _uiState.update { it.copy(nivelSalud = nivel) }
     }
 
     fun validarSalud(): ResultadoValidacionSalud {

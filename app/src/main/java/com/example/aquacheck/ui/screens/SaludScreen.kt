@@ -18,7 +18,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Hotel
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LocalBar
 import androidx.compose.material.icons.outlined.MonitorHeart
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Warning
@@ -43,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.aquacheck.model.MockData
-import com.example.aquacheck.model.NivelSalud
 import com.example.aquacheck.ui.components.AppCard
 import com.example.aquacheck.ui.components.AppTopAppBar
 import com.example.aquacheck.ui.components.PrimaryButton
@@ -69,13 +71,17 @@ fun SaludScreen(
     SaludContent(
         uiState = uiState,
         onBackClick = onBackClick,
+        onFrecuenciaCardiacaChange = { viewModel.setFrecuenciaCardiaca(it) },
         onSistolicaChange = { viewModel.setSistolica(it) },
         onDiastolicaChange = { viewModel.setDiastolica(it) },
         onSaturacionChange = { viewModel.setSaturacion(it) },
-        onDurmioMenos6hrsChange = { viewModel.setDurmioMenos6hrs(it) },
-        onResfrioDolorOidosChange = { viewModel.setResfrioDolorOidos(it) },
-        onConsumioAlcohol24hrsChange = { viewModel.setConsumioAlcohol24hrs(it) },
+        onHorasSuenoChange = { viewModel.setHorasSueno(it) },
+        onHorasUltimoAlcoholChange = { viewModel.setHorasUltimoAlcohol(it) },
+        onCongestionNasalChange = { viewModel.setTieneCongestionNasal(it) },
+        onMedicamentosNuevosChange = { viewModel.setTomaMedicamentosNuevos(it) },
+        onEstadoPsicologicoCalmoChange = { viewModel.setEstadoPsicologicoCalmo(it) },
         onContinuarClick = {
+            viewModel.validarSalud()
             onNavigateToChecklist()
         },
         modifier = modifier
@@ -86,20 +92,30 @@ fun SaludScreen(
 fun SaludContent(
     uiState: PreChequeoUiState,
     onBackClick: () -> Unit,
+    onFrecuenciaCardiacaChange: (String) -> Unit,
     onSistolicaChange: (String) -> Unit,
     onDiastolicaChange: (String) -> Unit,
     onSaturacionChange: (String) -> Unit,
-    onDurmioMenos6hrsChange: (Boolean) -> Unit,
-    onResfrioDolorOidosChange: (Boolean) -> Unit,
-    onConsumioAlcohol24hrsChange: (Boolean) -> Unit,
+    onHorasSuenoChange: (String) -> Unit,
+    onHorasUltimoAlcoholChange: (String) -> Unit,
+    onCongestionNasalChange: (Boolean) -> Unit,
+    onMedicamentosNuevosChange: (Boolean) -> Unit,
+    onEstadoPsicologicoCalmoChange: (Boolean) -> Unit,
     onContinuarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val hasBlankFields = uiState.frecuenciaCardiacaText.isBlank() ||
+        uiState.sistolicaText.isBlank() ||
+        uiState.diastolicaText.isBlank() ||
+        uiState.saturacionText.isBlank() ||
+        uiState.horasSuenoText.isBlank() ||
+        uiState.horasUltimoAlcoholText.isBlank()
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppTopAppBar(
-                title = "Evaluación de Salud del Buzo",
+                title = "Evaluación Médica de Salud",
                 onBackClick = onBackClick
             )
         }
@@ -122,16 +138,15 @@ fun SaludContent(
                     color = PrimaryDarkGreen
                 )
                 Text(
-                    text = "Ingrese los 3 parámetros de salud y responda la encuesta para activar el semáforo en vivo.",
+                    text = "Ingrese cada parámetro fisiológico en los campos correspondientes.",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
             }
 
-            // Live Health Traffic Light Banner (Semáforo de Salud en Vivo)
-            val nivelSalud = uiState.nivelSalud
-            if (nivelSalud == null) {
+            // Live Banner Status Handling
+            if (hasBlankFields) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -150,13 +165,13 @@ fun SaludContent(
                         )
                         Column {
                             Text(
-                                text = "SEMÁFORO DE SALUD EN VIVO",
+                                text = "EVALUACIÓN PENDIENTE DE INGRESO",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFE65100)
                             )
                             Text(
-                                text = "Ingrese sistólica, diastólica y saturación O₂ para calcular el nivel.",
+                                text = "Por favor rellenar todos los campos para validar aptitud.",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFE65100)
@@ -164,117 +179,86 @@ fun SaludContent(
                         }
                     }
                 }
+            } else if (!uiState.saludApto) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ObservadoContainerRed, shape = RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Warning,
+                                contentDescription = null,
+                                tint = ObservadoRed,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = "INHABILITADO / REQUIERE REVISIÓN",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = ObservadoRed
+                            )
+                        }
+                        Text(
+                            text = "Criterios médicos no cumplidos:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = ObservadoRed
+                        )
+                        uiState.mensajesValidacionSalud.forEach { mensaje ->
+                            Text(
+                                text = "• $mensaje",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = ObservadoRed
+                            )
+                        }
+                    }
+                }
             } else {
-                when (nivelSalud) {
-                    NivelSalud.NORMAL -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(AptoContainerGreen, shape = RoundedCornerShape(16.dp))
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.CheckCircle,
-                                    contentDescription = null,
-                                    tint = OnAptoContainerGreen,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Column {
-                                    Text(
-                                        text = "🟢 SALUD NORMAL",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = OnAptoContainerGreen
-                                    )
-                                    Text(
-                                        text = "Todos los parámetros en rango normal. Apto para inmersión.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = OnAptoContainerGreen
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    NivelSalud.ATENCION -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFFFF59D), shape = RoundedCornerShape(16.dp))
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Warning,
-                                    contentDescription = null,
-                                    tint = Color(0xFFF57F17),
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Column {
-                                    Text(
-                                        text = "🟡 SALUD EN ATENCIÓN",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFF57F17)
-                                    )
-                                    Text(
-                                        text = "Presión elevada, saturación levemente baja o alerta en la encuesta.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFF57F17)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    NivelSalud.CRITICA -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(ObservadoContainerRed, shape = RoundedCornerShape(16.dp))
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Warning,
-                                    contentDescription = null,
-                                    tint = ObservadoRed,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Column {
-                                    Text(
-                                        text = "🔴 SALUD CRÍTICA",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ObservadoRed
-                                    )
-                                    Text(
-                                        text = "Saturación < 92% o presión crítica. Inhabilitado para buceo.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = ObservadoRed
-                                    )
-                                }
-                            }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(AptoContainerGreen, shape = RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.CheckCircle,
+                            contentDescription = null,
+                            tint = OnAptoContainerGreen,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "EVALUACIÓN MÉDICA: APTO",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = OnAptoContainerGreen
+                            )
+                            Text(
+                                text = "Todos los parámetros médicos dentro del rango permitido.",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = OnAptoContainerGreen
+                            )
                         }
                     }
                 }
             }
 
-            // Section 1: Mediciones Fisiológicas (3 Números)
+            // Section 1: Signos Vitales
             AppCard(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "1. Mediciones Fisiológicas",
+                    text = "1. Signos Vitales",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryDarkGreen
@@ -283,38 +267,78 @@ fun SaludContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NumericInputField(
-                    label = "Presión Arterial Sistólica (mmHg)",
+                    label = "Frecuencia Cardíaca en reposo",
+                    value = uiState.frecuenciaCardiacaText,
+                    onValueChange = onFrecuenciaCardiacaChange,
+                    icon = Icons.Outlined.Favorite,
+                    placeholder = "Frecuencia Cardíaca (lpm)"
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NumericInputField(
+                    label = "Presión Arterial Sistólica",
                     value = uiState.sistolicaText,
                     onValueChange = onSistolicaChange,
                     icon = Icons.Outlined.Speed,
-                    placeholder = "Ej: 120"
+                    placeholder = "Presión Sistólica (mmHg)"
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NumericInputField(
-                    label = "Presión Arterial Diastólica (mmHg)",
+                    label = "Presión Arterial Diastólica",
                     value = uiState.diastolicaText,
                     onValueChange = onDiastolicaChange,
                     icon = Icons.Outlined.Speed,
-                    placeholder = "Ej: 80"
+                    placeholder = "Presión Diastólica (mmHg)"
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NumericInputField(
-                    label = "Saturación de O₂ (%)",
+                    label = "Saturación de Oxígeno SpO2",
                     value = uiState.saturacionText,
                     onValueChange = onSaturacionChange,
                     icon = Icons.Outlined.MonitorHeart,
-                    placeholder = "Ej: 98"
+                    placeholder = "Saturación SpO2 (%)"
                 )
             }
 
-            // Section 2: Encuesta de Salud (3 Preguntas)
+            // Section 2: Descanso y Hábitos
             AppCard(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "2. Encuesta de Salud",
+                    text = "2. Descanso y Hábitos",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryDarkGreen
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NumericInputField(
+                    label = "Horas de Sueño en las últimas 24h",
+                    value = uiState.horasSuenoText,
+                    onValueChange = onHorasSuenoChange,
+                    icon = Icons.Outlined.Hotel,
+                    placeholder = "Horas de Sueño (hrs)"
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NumericInputField(
+                    label = "Horas desde el Último Consumo de Alcohol",
+                    value = uiState.horasUltimoAlcoholText,
+                    onValueChange = onHorasUltimoAlcoholChange,
+                    icon = Icons.Outlined.LocalBar,
+                    placeholder = "Horas sin Consumo de Alcohol (hrs)"
+                )
+            }
+
+            // Section 3: Sintomatología y Estado Psicológico
+            AppCard(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "3. Evaluación Sintomática y Psicológica",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryDarkGreen
@@ -323,25 +347,27 @@ fun SaludContent(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 BooleanSelectionRow(
-                    title = "¿Durmió menos de 6 horas?",
-                    selectedValue = uiState.durmioMenos6hrs,
-                    onValueSelected = onDurmioMenos6hrsChange
+                    title = "Congestión Nasal / Sinusal",
+                    selectedValue = uiState.tieneCongestionNasal,
+                    onValueSelected = onCongestionNasalChange
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 BooleanSelectionRow(
-                    title = "¿Resfrío o dolor de oídos?",
-                    selectedValue = uiState.resfrioDolorOidos,
-                    onValueSelected = onResfrioDolorOidosChange
+                    title = "Medicamentos Nuevos / Sedantes",
+                    selectedValue = uiState.tomaMedicamentosNuevos,
+                    onValueSelected = onMedicamentosNuevosChange
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 BooleanSelectionRow(
-                    title = "¿Consumió alcohol en las últimas 24 horas?",
-                    selectedValue = uiState.consumioAlcohol24hrs,
-                    onValueSelected = onConsumioAlcohol24hrsChange
+                    title = "Estado Psicológico Calmo y Enfocado",
+                    selectedValue = uiState.estadoPsicologicoCalmo,
+                    onValueSelected = onEstadoPsicologicoCalmoChange,
+                    positiveLabel = "Sí (Calmo)",
+                    negativeLabel = "No (Alterado)"
                 )
             }
 
@@ -465,12 +491,15 @@ fun SaludScreenPreview() {
                 currentBuzo = MockData.mockBuzos[0]
             ),
             onBackClick = {},
+            onFrecuenciaCardiacaChange = {},
             onSistolicaChange = {},
             onDiastolicaChange = {},
             onSaturacionChange = {},
-            onDurmioMenos6hrsChange = {},
-            onResfrioDolorOidosChange = {},
-            onConsumioAlcohol24hrsChange = {},
+            onHorasSuenoChange = {},
+            onHorasUltimoAlcoholChange = {},
+            onCongestionNasalChange = {},
+            onMedicamentosNuevosChange = {},
+            onEstadoPsicologicoCalmoChange = {},
             onContinuarClick = {}
         )
     }

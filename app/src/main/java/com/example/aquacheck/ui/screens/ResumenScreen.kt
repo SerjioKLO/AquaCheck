@@ -47,7 +47,6 @@ import coil.compose.AsyncImage
 import com.example.aquacheck.model.EstadoItem
 import com.example.aquacheck.model.EvidenciaItem
 import com.example.aquacheck.model.MockData
-import com.example.aquacheck.model.NivelSalud
 import com.example.aquacheck.model.Resultado
 import com.example.aquacheck.ui.components.AppCard
 import com.example.aquacheck.ui.components.AppTopAppBar
@@ -184,7 +183,7 @@ fun ResumenContent(
 
                 // Medical Health Section Summary
                 Text(
-                    text = "Evaluación de Salud y Encuesta",
+                    text = "Parámetros Médicos Fisiológicos",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryDarkGreen
@@ -192,44 +191,21 @@ fun ResumenContent(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                DetailItem(label = "Frecuencia Cardíaca", value = "${uiState.frecuenciaCardiacaText} lpm")
                 DetailItem(label = "Presión Arterial", value = "${uiState.sistolicaText} / ${uiState.diastolicaText} mmHg")
-                DetailItem(label = "Saturación O₂", value = "${uiState.saturacionText}%")
-                DetailItem(label = "¿Durmió menos de 6 horas?", value = if (uiState.durmioMenos6hrs) "Sí (Alerta)" else "No")
-                DetailItem(label = "¿Resfrío o dolor de oídos?", value = if (uiState.resfrioDolorOidos) "Sí (Alerta)" else "No")
-                DetailItem(label = "¿Consumió alcohol en las últimas 24 horas?", value = if (uiState.consumioAlcohol24hrs) "Sí (Alerta)" else "No")
-                
-                val semaforoTexto = when (uiState.nivelSalud) {
-                    NivelSalud.NORMAL -> "🟢 Normal"
-                    NivelSalud.ATENCION -> "🟡 Atención"
-                    NivelSalud.CRITICA -> "🔴 Crítica"
-                    null -> "No calculado"
-                }
-                DetailItem(label = "Semáforo de Salud", value = semaforoTexto)
+                DetailItem(label = "Saturación SpO2", value = "${uiState.saturacionText}%")
+                DetailItem(label = "Horas de Sueño", value = "${uiState.horasSuenoText} hrs")
+                DetailItem(label = "Tiempo sin Alcohol", value = "${uiState.horasUltimoAlcoholText} hrs")
+                DetailItem(label = "Congestión Nasal", value = if (uiState.tieneCongestionNasal) "Sí (Alerta)" else "No (Normal)")
+                DetailItem(label = "Medicamentos Nuevos", value = if (uiState.tomaMedicamentosNuevos) "Sí (Alerta)" else "No (Normal)")
+                DetailItem(label = "Estado Psicológico", value = if (uiState.estadoPsicologicoCalmo) "Calmo" else "Alterado")
 
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalDivider(color = OutlineBorder)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Observaciones",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryDarkGreen
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (uiState.observacionesText.isNotBlank()) uiState.observacionesText else "Sin observaciones.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = OutlineBorder)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Desglose de Checklist de Seguridad",
+                    text = "Desglose de Equipamiento Faena",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryDarkGreen
@@ -253,11 +229,11 @@ fun ResumenContent(
                             modifier = Modifier.weight(1f)
                         )
                         val statusString = when (item.estado) {
-                            EstadoItem.CUMPLE -> "Cumple"
-                            EstadoItem.OBSERVADO -> "Observado"
-                            EstadoItem.NO_CUMPLE -> "No Cumple"
-                            EstadoItem.PENDIENTE -> "Pendiente"
-                            EstadoItem.NO_APLICA -> "No Aplica"
+                            EstadoItem.CUMPLE -> "APTO"
+                            EstadoItem.OBSERVADO -> "OBSERVADO"
+                            EstadoItem.NO_CUMPLE -> "OBSERVADO"
+                            EstadoItem.PENDIENTE -> "PENDIENTE"
+                            EstadoItem.NO_APLICA -> "N/A"
                         }
                         StatusChip(status = statusString)
                     }

@@ -19,15 +19,12 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,9 +64,6 @@ fun ChecklistScreen(
         onItemEstadoChange = { itemId, estado ->
             viewModel.updateItemEstado(itemId, estado)
         },
-        onObservacionesChange = {
-            viewModel.setObservacionesText(it)
-        },
         onSiguienteClick = {
             viewModel.calcularResultado()
             onNavigateToEvidencias()
@@ -83,7 +77,6 @@ fun ChecklistContent(
     uiState: PreChequeoUiState,
     onBackClick: () -> Unit,
     onItemEstadoChange: (String, EstadoItem) -> Unit,
-    onObservacionesChange: (String) -> Unit,
     onSiguienteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -91,7 +84,7 @@ fun ChecklistContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AppTopAppBar(
-                title = "Checklist de Pre-Chequeo",
+                title = "Evaluación de Seguridad",
                 onBackClick = onBackClick
             )
         }
@@ -122,7 +115,7 @@ fun ChecklistContent(
                 )
             }
 
-            // LazyColumn of items + Observaciones field
+            // LazyColumn of items
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -136,36 +129,6 @@ fun ChecklistContent(
                         }
                     )
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AppCard(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = "Observaciones generales",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryDarkGreen
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = uiState.observacionesText,
-                            onValueChange = onObservacionesChange,
-                            placeholder = { Text("Ingrese observaciones (obligatorio si hay ítems 'No cumple' u 'Observado')", color = Color.Gray) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(100.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                focusedBorderColor = PrimaryDarkGreen,
-                                unfocusedBorderColor = PrimaryDarkGreen,
-                                focusedLabelColor = PrimaryDarkGreen,
-                                unfocusedLabelColor = Color.Black
-                            )
-                        )
-                    }
-                }
             }
 
             // Bottom Navigation Button
@@ -175,7 +138,7 @@ fun ChecklistContent(
                     .padding(16.dp)
             ) {
                 PrimaryButton(
-                    text = "Siguiente a Evidencias",
+                    text = "Siguiente",
                     icon = Icons.AutoMirrored.Rounded.ArrowForward,
                     onClick = onSiguienteClick,
                     modifier = Modifier.fillMaxWidth()
@@ -192,33 +155,18 @@ private fun ChecklistItemCard(
     modifier: Modifier = Modifier
 ) {
     AppCard(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = item.nombre,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = OnBackgroundText,
-                modifier = Modifier.weight(1f)
-            )
-            if (item.esCritico) {
-                Text(
-                    text = "(Crítico)",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = ObservadoRed
-                )
-            }
-        }
+        Text(
+            text = item.nombre,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = OnBackgroundText
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Option 1: Cumple
@@ -233,7 +181,7 @@ private fun ChecklistItemCard(
                     ) {
                         Text(
                             text = "Cumple",
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
                             fontWeight = if (isCumple) FontWeight.Bold else FontWeight.SemiBold,
@@ -249,63 +197,7 @@ private fun ChecklistItemCard(
                 modifier = Modifier.weight(1f)
             )
 
-            // Option 2: No Cumple
-            val isNoCumple = item.estado == EstadoItem.NO_CUMPLE
-            FilterChip(
-                selected = isNoCumple,
-                onClick = { onEstadoSelected(EstadoItem.NO_CUMPLE) },
-                label = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No Cumple",
-                            fontSize = 10.sp,
-                            maxLines = 1,
-                            textAlign = TextAlign.Center,
-                            fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.SemiBold,
-                            color = if (isNoCumple) ObservadoRed else OnBackgroundText
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(20.dp),
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = ObservadoContainerRed,
-                    selectedLabelColor = ObservadoRed
-                ),
-                modifier = Modifier.weight(1f)
-            )
-
-            // Option 3: No Aplica
-            val isNoAplica = item.estado == EstadoItem.NO_APLICA
-            FilterChip(
-                selected = isNoAplica,
-                onClick = { onEstadoSelected(EstadoItem.NO_APLICA) },
-                label = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No Aplica",
-                            fontSize = 10.sp,
-                            maxLines = 1,
-                            textAlign = TextAlign.Center,
-                            fontWeight = if (isNoAplica) FontWeight.Bold else FontWeight.SemiBold,
-                            color = if (isNoAplica) Color.White else OnBackgroundText
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(20.dp),
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color.Gray,
-                    selectedLabelColor = Color.White
-                ),
-                modifier = Modifier.weight(1f)
-            )
-
-            // Option 4: Observado
+            // Option 2: Observado
             val isObservado = item.estado == EstadoItem.OBSERVADO
             FilterChip(
                 selected = isObservado,
@@ -317,18 +209,46 @@ private fun ChecklistItemCard(
                     ) {
                         Text(
                             text = "Observado",
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                             maxLines = 1,
                             textAlign = TextAlign.Center,
                             fontWeight = if (isObservado) FontWeight.Bold else FontWeight.SemiBold,
-                            color = if (isObservado) Color(0xFFE65100) else OnBackgroundText
+                            color = if (isObservado) ObservadoRed else OnBackgroundText
                         )
                     }
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFFFFF3E0),
-                    selectedLabelColor = Color(0xFFE65100)
+                    selectedContainerColor = ObservadoContainerRed,
+                    selectedLabelColor = ObservadoRed
+                ),
+                modifier = Modifier.weight(1f)
+            )
+
+            // Option 3: No Cumple
+            val isNoCumple = item.estado == EstadoItem.NO_CUMPLE
+            FilterChip(
+                selected = isNoCumple,
+                onClick = { onEstadoSelected(EstadoItem.NO_CUMPLE) },
+                label = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No Cumple",
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            fontWeight = if (isNoCumple) FontWeight.Bold else FontWeight.SemiBold,
+                            color = if (isNoCumple) ObservadoRed else OnBackgroundText
+                        )
+                    }
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = ObservadoContainerRed,
+                    selectedLabelColor = ObservadoRed
                 ),
                 modifier = Modifier.weight(1f)
             )
@@ -349,7 +269,6 @@ fun ChecklistScreenPreview() {
             ),
             onBackClick = {},
             onItemEstadoChange = { _, _ -> },
-            onObservacionesChange = {},
             onSiguienteClick = {}
         )
     }
