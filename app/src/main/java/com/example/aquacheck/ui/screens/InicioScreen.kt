@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Sync
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -69,8 +70,8 @@ import com.example.aquacheck.ui.components.NavigationTab
 import com.example.aquacheck.ui.components.StatusChip
 import com.example.aquacheck.ui.theme.AptoContainerGreen
 import com.example.aquacheck.ui.theme.AquaCheckTheme
-import com.example.aquacheck.ui.theme.BackgroundLight
 import com.example.aquacheck.ui.theme.OnPrimaryWhite
+import com.example.aquacheck.ui.theme.ObservadoRed
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
 import com.example.aquacheck.viewmodel.PreChequeoUiState
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
@@ -124,6 +125,7 @@ fun InicioContent(
     var isSyncing by remember { mutableStateOf(false) }
     var syncProgress by remember { mutableFloatStateOf(0f) }
     var filterMenuExpanded by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     val navigationTabs = listOf(
         NavigationTab("Historial", Icons.Rounded.History),
@@ -169,12 +171,14 @@ fun InicioContent(
             AppTopAppBar(
                 title = if (selectedTab == 2) "Mi Perfil" else "AquaCheck",
                 actions = {
-                    TextButton(onClick = onLogoutClick) {
-                        Text(
-                            text = "Salir",
-                            color = OnPrimaryWhite,
-                            fontWeight = FontWeight.Bold
-                        )
+                    if (selectedTab == 2) {
+                        TextButton(onClick = { showLogoutDialog = true }) {
+                            Text(
+                                text = "Cerrar sesión",
+                                color = OnPrimaryWhite,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             )
@@ -255,7 +259,7 @@ fun InicioContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(BackgroundLight)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             when (selectedTab) {
                 0, 1 -> {
@@ -269,7 +273,7 @@ fun InicioContent(
                             OutlinedTextField(
                                 value = uiState.searchQuery,
                                 onValueChange = onSearchQueryChange,
-                                label = { Text("Buscar", color = Color.Black, fontWeight = FontWeight.SemiBold) },
+                                label = { Text("Buscar", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Rounded.Search,
@@ -307,12 +311,12 @@ fun InicioContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = Color.Black,
-                                    unfocusedTextColor = Color.Black,
+                                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                                     focusedBorderColor = PrimaryDarkGreen,
                                     unfocusedBorderColor = PrimaryDarkGreen,
                                     focusedLabelColor = PrimaryDarkGreen,
-                                    unfocusedLabelColor = Color.Black
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
                                 )
                             )
                         }
@@ -342,6 +346,30 @@ fun InicioContent(
             )
         }
     }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            containerColor = Color.White,
+            title = { Text("Cerrar sesión", fontWeight = FontWeight.Bold, color = Color.Black) },
+            text = { Text("¿Está seguro de que desea cerrar sesión en la aplicación?", color = Color.Black) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        onLogoutClick()
+                    }
+                ) {
+                    Text("Cerrar sesión", fontWeight = FontWeight.Bold, color = ObservadoRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancelar", fontWeight = FontWeight.Bold, color = PrimaryDarkGreen)
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -359,7 +387,7 @@ private fun HistorialTab(
                 text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     } else {
@@ -409,19 +437,19 @@ private fun PreChequeoCard(
             text = "Buzo: ${preChequeo.buzo.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = "Supervisor: ${preChequeo.supervisor.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = "Centro: ${preChequeo.centro.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

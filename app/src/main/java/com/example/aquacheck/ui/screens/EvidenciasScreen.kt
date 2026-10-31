@@ -117,6 +117,7 @@ fun EvidenciasContent(
     var pendingBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
     var evidenciaTitulo by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
@@ -174,15 +175,35 @@ fun EvidenciasContent(
             )
         },
         bottomBar = {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(SurfaceLight)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    )
+                }
                 PrimaryButton(
                     text = "Siguiente",
-                    onClick = onSiguienteClick,
+                    onClick = {
+                        if (uiState.evidencias.size < 4) {
+                            errorMessage = "Por favor adjunte al menos 4 evidencias fotográficas para continuar."
+                        } else {
+                            errorMessage = null
+                            onSiguienteClick()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -196,7 +217,7 @@ fun EvidenciasContent(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Text(
-                text = "Registra el estado del equipo y el área de trabajo.",
+                text = "Registra el estado del equipo y el área de trabajo (mínimo 4 fotos).",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,

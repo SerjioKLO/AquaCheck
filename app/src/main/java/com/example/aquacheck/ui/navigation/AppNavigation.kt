@@ -2,10 +2,8 @@ package com.example.aquacheck.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -21,6 +19,7 @@ import com.example.aquacheck.ui.screens.LoginScreen
 import com.example.aquacheck.ui.screens.PreChequeoScreen
 import com.example.aquacheck.ui.screens.ResumenScreen
 import com.example.aquacheck.ui.screens.SaludScreen
+import com.example.aquacheck.ui.screens.SplashScreen
 import com.example.aquacheck.viewmodel.PreChequeoViewModel
 
 @Composable
@@ -34,21 +33,26 @@ fun AppNavigation(
         viewModel.initDatabase(context)
     }
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(uiState.currentUser) {
-        if (uiState.currentUser != null && navController.currentDestination?.route == "login") {
-            navController.navigate("inicio") {
-                popUpTo("login") { inclusive = true }
-            }
-        }
-    }
-
     NavHost(
         navController = navController,
-        startDestination = "login",
+        startDestination = "splash",
         modifier = modifier
     ) {
+        composable("splash") {
+            SplashScreen(
+                viewModel = viewModel,
+                onNavigateToDashboard = {
+                    navController.navigate("inicio") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate("login") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("login") {
             LoginScreen(
                 onLoginClick = { usuario, clave ->
