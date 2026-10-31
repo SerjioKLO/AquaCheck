@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aquacheck.data.AppDatabase
+import com.example.aquacheck.data.PreChequeoDao
 import com.example.aquacheck.data.PreChequeoRepository
+import com.example.aquacheck.data.SupabaseSyncManager
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
 import com.example.aquacheck.model.DatosSalud
@@ -34,10 +36,11 @@ data class ResultadoValidacionSalud(
 open class PreChequeoViewModel : ViewModel() {
 
     private var repository: PreChequeoRepository? = null
+    private var dao: PreChequeoDao? = null
 
     private val _uiState = MutableStateFlow(
         PreChequeoUiState(
-            preChequeos = MockData.mockPreChequeos,
+            preChequeos = emptyList(),
             currentBuzo = MockData.mockBuzos.firstOrNull(),
             currentSupervisor = MockData.mockSupervisores.firstOrNull(),
             currentCentro = MockData.mockCentros.firstOrNull(),
@@ -58,24 +61,41 @@ open class PreChequeoViewModel : ViewModel() {
         initSession(context)
         if (repository != null) return
         try {
-            val dao = AppDatabase.getDatabase(context).preChequeoDao()
-            val repo = PreChequeoRepository(dao)
+            val d = AppDatabase.getDatabase(context).preChequeoDao()
+            dao = d
+            val repo = PreChequeoRepository(d)
             repository = repo
             viewModelScope.launch {
+                try {
+                    d.deleteAllMockData()
+                } catch (e: Exception) {
+                    // Ignore
+                }
                 repo.getAllPreChequeos().collectLatest { list ->
-                    val preChequeosList = if (list.isEmpty()) {
-                        MockData.mockPreChequeos.forEach { mock ->
-                            repo.insertPreChequeo(mock)
-                        }
-                        MockData.mockPreChequeos
-                    } else {
-                        list
-                    }
-                    _uiState.update { it.copy(preChequeos = preChequeosList) }
+                    _uiState.update { it.copy(preChequeos = list) }
                 }
             }
         } catch (e: Exception) {
             // Fallback if database fails
+        }
+    }
+
+    fun sincronizarConSupabase(onComplete: (Boolean, String) -> Unit) {
+        val currentDao = dao
+        if (currentDao == null) {
+            onComplete(false, "Base de datos no inicializada")
+            return
+        }
+        viewModelScope.launch {
+            val syncManager = SupabaseSyncManager(currentDao)
+            val result = syncManager.sincronizar()
+            if (result.isSuccess) {
+                val count = result.getOrDefault(0)
+                onComplete(true, "Sincronización completada ($count registros procesados)")
+            } else {
+                val err = result.exceptionOrNull()?.message ?: "Error al conectar con Supabase"
+                onComplete(false, "Error de sincronización: $err")
+            }
         }
     }
 

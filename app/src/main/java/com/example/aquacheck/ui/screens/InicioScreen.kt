@@ -57,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -104,6 +105,9 @@ fun InicioScreen(
         onUpdateProfileImageUri = { uri ->
             viewModel.updateProfileImageUri(uri)
         },
+        onSyncClick = { onComplete ->
+            viewModel.sincronizarConSupabase(onComplete)
+        },
         modifier = modifier
     )
 }
@@ -118,6 +122,7 @@ fun InicioContent(
     onDetalleClick: (String) -> Unit,
     onUpdateProfile: (String, String, String) -> Unit,
     onUpdateProfileImageUri: (String?) -> Unit,
+    onSyncClick: ((Boolean, String) -> Unit) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -139,13 +144,18 @@ fun InicioContent(
         isSyncing = true
         syncProgress = 0f
         coroutineScope.launch {
-            for (i in 1..100) {
-                delay(20)
-                syncProgress = i / 100f
+            for (i in 1..5) {
+                delay(50)
+                syncProgress = i / 10f
             }
-            delay(200)
-            isSyncing = false
-            snackbarHostState.showSnackbar("Sincronizacion completada")
+            onSyncClick { _, message ->
+                syncProgress = 1f
+                coroutineScope.launch {
+                    delay(300)
+                    isSyncing = false
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
         }
     }
 
@@ -202,7 +212,7 @@ fun InicioContent(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Sincronizando...",
+                                text = "Sincronizando con Supabase...",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Bold,
                                 color = PrimaryDarkGreen
@@ -387,8 +397,10 @@ private fun HistorialTab(
             Text(
                 text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center,
+                color = Color.Black,
+                modifier = Modifier.padding(horizontal = 24.dp)
             )
         }
     } else {
@@ -467,7 +479,8 @@ fun InicioScreenPreview() {
             onLogoutClick = {},
             onDetalleClick = {},
             onUpdateProfile = { _, _, _ -> },
-            onUpdateProfileImageUri = {}
+            onUpdateProfileImageUri = {},
+            onSyncClick = {}
         )
     }
 }

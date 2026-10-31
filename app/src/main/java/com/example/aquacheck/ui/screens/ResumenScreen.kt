@@ -320,9 +320,14 @@ private fun EvidenciaThumbItem(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
-                } else if (evidencia.imagePath != null) {
+                } else if (!evidencia.imagePath.isNullOrBlank()) {
+                    val imageModel: Any = if (evidencia.imagePath.startsWith("http://") || evidencia.imagePath.startsWith("https://")) {
+                        evidencia.imagePath
+                    } else {
+                        File(evidencia.imagePath)
+                    }
                     AsyncImage(
-                        model = File(evidencia.imagePath),
+                        model = imageModel,
                         contentDescription = evidencia.titulo,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

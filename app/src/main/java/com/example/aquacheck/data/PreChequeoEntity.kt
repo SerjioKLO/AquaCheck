@@ -38,7 +38,8 @@ data class PreChequeoEntity(
     val tieneCongestionNasal: Boolean = false,
     val tomaMedicamentosNuevos: Boolean = false,
     val estadoPsicologicoCalmo: Boolean = true,
-    val evidenciasJson: String = ""
+    val evidenciasJson: String = "",
+    val sincronizado: Boolean = false
 ) {
     fun toDomain(): PreChequeo {
         val evidenciasList = toEvidenciasList(evidenciasJson)
@@ -125,7 +126,8 @@ data class PreChequeoEntity(
                 tieneCongestionNasal = preChequeo.tieneCongestionNasal,
                 tomaMedicamentosNuevos = preChequeo.tomaMedicamentosNuevos,
                 estadoPsicologicoCalmo = preChequeo.estadoPsicologicoCalmo,
-                evidenciasJson = fromEvidenciasList(preChequeo.evidencias)
+                evidenciasJson = fromEvidenciasList(preChequeo.evidencias),
+                sincronizado = false
             )
         }
     }

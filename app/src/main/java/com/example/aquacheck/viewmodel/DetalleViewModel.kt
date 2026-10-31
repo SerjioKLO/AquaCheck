@@ -6,8 +6,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.aquacheck.data.AppDatabase
 import com.example.aquacheck.data.PreChequeoRepository
+import com.example.aquacheck.data.SupabaseClientConfig
 import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
+import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,6 +51,15 @@ class DetalleViewModel(
     fun eliminarChequeo(onDeleted: () -> Unit) {
         val currentChequeo = _chequeo.value ?: return
         viewModelScope.launch {
+            try {
+                SupabaseClientConfig.postgrest.from("prechequeos").delete {
+                    filter {
+                        eq("id", currentChequeo.id)
+                    }
+                }
+            } catch (e: Exception) {
+                // Ignore if offline
+            }
             repository.deletePreChequeo(currentChequeo.id)
             onDeleted()
         }

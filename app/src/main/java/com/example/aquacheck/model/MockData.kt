@@ -43,28 +43,5 @@ object MockData {
 
     val defaultEvidencias = emptyList<EvidenciaItem>()
 
-    val mockPreChequeos = listOf(
-        PreChequeo(
-            id = "pc1",
-            buzo = mockBuzos[0],
-            supervisor = mockSupervisores[0],
-            centro = mockCentros[0],
-            fecha = "2026-10-04",
-            items = defaultChecklistItems,
-            evidencias = defaultEvidencias,
-            resultado = "Apto"
-        ),
-        PreChequeo(
-            id = "pc2",
-            buzo = mockBuzos[1],
-            supervisor = mockSupervisores[1],
-            centro = mockCentros[1],
-            fecha = "2026-10-03",
-            items = defaultChecklistItems.mapIndexed { index, item ->
-                if (index == 2) item.copy(estado = EstadoItem.OBSERVADO) else item
-            },
-            evidencias = defaultEvidencias.take(2),
-            resultado = "Observado"
-        )
-    )
+    val mockPreChequeos = emptyList<PreChequeo>()
 }

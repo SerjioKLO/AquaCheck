@@ -82,8 +82,10 @@ fun DetalleScreen(
         chequeo = chequeo,
         onBackClick = onBackClick,
         onDeleteClick = {
-            viewModel.eliminarChequeo {
-                onBackClick()
+            chequeo?.id?.let {
+                viewModel.eliminarChequeo {
+                    onBackClick()
+                }
             }
         },
         modifier = modifier
@@ -176,27 +178,25 @@ fun DetalleContent(
                         fontWeight = FontWeight.Bold,
                         color = PrimaryDarkGreen
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    DetailRow(label = "Centro de Operación", value = chequeo.centro.nombre)
-                    DetailRow(label = "Ubicación", value = chequeo.centro.ubicacion)
+                    Spacer(modifier = Modifier.height(8.dp))
                     DetailRow(label = "Buzo", value = "${chequeo.buzo.nombre} (${chequeo.buzo.certificacion})")
                     DetailRow(label = "Supervisor a cargo", value = chequeo.supervisor.nombre)
                     DetailRow(label = "Centro de Operación", value = "${chequeo.centro.nombre} - ${chequeo.centro.ubicacion}")
                     DetailRow(label = "Fecha y Hora", value = chequeo.fecha)
                 }
 
-                // Checklist
+                // Sección 1: Fallas y Observaciones del Checklist (Filtro Crítico)
                 AppCard(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Checklist y Hallazgos Críticos",
+                        text = "Sección 1: Checklist y Hallazgos Críticos",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryDarkGreen
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    val fallasItems = chequeo.items.filter {
-                        it.estado == EstadoItem.NO_CUMPLE || it.estado == EstadoItem.OBSERVADO
+                    val fallasItems = chequeo.items.filter { 
+                        it.estado == EstadoItem.NO_CUMPLE || it.estado == EstadoItem.OBSERVADO 
                     }
 
                     if (fallasItems.isEmpty()) {
@@ -257,21 +257,77 @@ fun DetalleContent(
                 // Sección 2: Parámetros Médicos de Salud
                 AppCard(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Parámetros Médicos de Salud",
+                        text = "Sección 2: Parámetros Médicos de Salud",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryDarkGreen
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    DetailRow(label = "Presión Sistólica", value = "${chequeo.sistolica} mmHg")
-                    DetailRow(label = "Presión Diastólica", value = "${chequeo.diastolica} mmHg")
-                    DetailRow(label = "Saturación O₂", value = "${chequeo.saturacion}%")
-                    DetailRow(label = "Frecuencia Cardíaca", value = "${chequeo.frecuenciaCardiaca} lpm")
-                    DetailRow(label = "Horas de Sueño", value = "${chequeo.horasSueno} hrs")
-                    DetailRow(label = "Último Consumo de Alcohol", value = "${chequeo.horasUltimoAlcohol} hrs atrás")
-                    DetailRow(label = "Durmió menos de 6 horas", value = if (chequeo.horasSueno < 6) "Sí (Alerta)" else "No")
-                    DetailRow(label = "Resfrío o dolor de oídos", value = if (chequeo.tieneCongestionNasal) "Sí (Alerta)" else "No")
-                    DetailRow(label = "Consumió alcohol en las últimas 24h", value = if (chequeo.horasUltimoAlcohol < 24 && chequeo.horasUltimoAlcohol > 0) "Sí (Alerta)" else "No")
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    val fc = chequeo.frecuenciaCardiaca
+                    val sis = chequeo.sistolica
+                    val dia = chequeo.diastolica
+                    val sat = chequeo.saturacion
+                    val sueno = chequeo.horasSueno
+                    val alcohol = chequeo.horasUltimoAlcohol
+                    val congestion = chequeo.tieneCongestionNasal
+                    val meds = chequeo.tomaMedicamentosNuevos
+                    val psicologico = chequeo.estadoPsicologicoCalmo
+
+                    MedicalParamRow(
+                        label = "1. Frecuencia Cardíaca",
+                        value = "$fc lpm",
+                        isAlert = fc !in 50..100 && fc != 0,
+                        alertMessage = "Rango seguro: 50 - 100 lpm"
+                    )
+                    MedicalParamRow(
+                        label = "2. Presión Sistólica",
+                        value = "$sis mmHg",
+                        isAlert = sis !in 90..140 && sis != 0,
+                        alertMessage = "Rango seguro: 90 - 140 mmHg"
+                    )
+                    MedicalParamRow(
+                        label = "3. Presión Diastólica",
+                        value = "$dia mmHg",
+                        isAlert = dia !in 60..90 && dia != 0,
+                        alertMessage = "Rango seguro: 60 - 90 mmHg"
+                    )
+                    MedicalParamRow(
+                        label = "4. Saturación SpO2",
+                        value = "$sat%",
+                        isAlert = sat < 95 && sat != 0,
+                        alertMessage = "Rango seguro: mínimo 95%"
+                    )
+                    MedicalParamRow(
+                        label = "5. Horas de Sueño",
+                        value = "$sueno hrs",
+                        isAlert = sueno < 6 && sueno != 0,
+                        alertMessage = "Mínimo 6 horas"
+                    )
+                    MedicalParamRow(
+                        label = "6. Tiempo sin Alcohol",
+                        value = "$alcohol hrs",
+                        isAlert = alcohol <= 12 && alcohol != 0,
+                        alertMessage = "Mínimo 12 horas sin alcohol"
+                    )
+                    MedicalParamRow(
+                        label = "7. Congestión Nasal",
+                        value = if (congestion) "Sí (Riesgo)" else "No (Normal)",
+                        isAlert = congestion,
+                        alertMessage = "Incompatible con inmersión"
+                    )
+                    MedicalParamRow(
+                        label = "8. Medicamentos Nuevos",
+                        value = if (meds) "Sí (Riesgo)" else "No (Normal)",
+                        isAlert = meds,
+                        alertMessage = "Evaluar compatibilidad con buceo"
+                    )
+                    MedicalParamRow(
+                        label = "9. Estado Psicológico",
+                        value = if (psicologico) "Calmo" else "Alterado (Riesgo)",
+                        isAlert = !psicologico,
+                        alertMessage = "Requiere estado calmo y enfocado"
+                    )
                 }
 
                 // Sección 3: Evidencias Fotográficas
@@ -282,16 +338,20 @@ fun DetalleContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Evidencias Fotográficas",
+                            text = "Sección 3: Evidencias Fotográficas",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryDarkGreen
+                            color = PrimaryDarkGreen,
+                            modifier = Modifier.weight(1f)
                         )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${chequeo.evidencias.size} fotos",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryDarkGreen
+                            color = PrimaryDarkGreen,
+                            softWrap = false,
+                            maxLines = 1
                         )
                     }
 
@@ -349,6 +409,7 @@ fun DetalleContent(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
+            containerColor = Color.White,
             title = { Text("Eliminar Pre-Chequeo", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface) },
             text = { Text("¿Está seguro de que desea eliminar este registro de pre-chequeo? Esta acción no se puede deshacer.", color = MaterialTheme.colorScheme.onSurface) },
             confirmButton = {
@@ -378,15 +439,58 @@ private fun DetailRow(
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = PrimaryDarkGreen
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = Color.Black
+        )
+    }
+}
+
+@Composable
+private fun MedicalParamRow(
+    label: String,
+    value: String,
+    isAlert: Boolean,
+    alertMessage: String
+) {
+    val containerColor = if (isAlert) ObservadoContainerRed else Color.Transparent
+    val textColor = if (isAlert) ObservadoRed else Color.Black
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(containerColor, shape = RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+            if (isAlert) {
+                Text(
+                    text = alertMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = ObservadoRed,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = textColor
         )
     }
 }
@@ -418,9 +522,14 @@ private fun DetalleEvidenciaItem(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
-                } else if (evidencia.imagePath != null) {
+                } else if (!evidencia.imagePath.isNullOrBlank()) {
+                    val imageModel: Any = if (evidencia.imagePath.startsWith("http://") || evidencia.imagePath.startsWith("https://")) {
+                        evidencia.imagePath
+                    } else {
+                        File(evidencia.imagePath)
+                    }
                     AsyncImage(
-                        model = File(evidencia.imagePath),
+                        model = imageModel,
                         contentDescription = evidencia.titulo,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
@@ -451,7 +560,7 @@ private fun DetalleEvidenciaItem(
 fun DetalleScreenPreview() {
     AquaCheckTheme {
         DetalleContent(
-            chequeo = MockData.mockPreChequeos[1],
+            chequeo = MockData.mockPreChequeos.firstOrNull(),
             onBackClick = {},
             onDeleteClick = {}
         )
