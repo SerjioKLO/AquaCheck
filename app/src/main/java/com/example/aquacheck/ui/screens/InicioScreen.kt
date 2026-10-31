@@ -70,6 +70,7 @@ import com.example.aquacheck.ui.components.NavigationTab
 import com.example.aquacheck.ui.components.StatusChip
 import com.example.aquacheck.ui.theme.AptoContainerGreen
 import com.example.aquacheck.ui.theme.AquaCheckTheme
+import com.example.aquacheck.ui.theme.BackgroundLight
 import com.example.aquacheck.ui.theme.OnPrimaryWhite
 import com.example.aquacheck.ui.theme.ObservadoRed
 import com.example.aquacheck.ui.theme.PrimaryDarkGreen
@@ -193,7 +194,7 @@ fun InicioContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface)
+                            .background(BackgroundLight)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Row(
@@ -259,7 +260,7 @@ fun InicioContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background)
+                .background(BackgroundLight)
         ) {
             when (selectedTab) {
                 0, 1 -> {
@@ -273,7 +274,7 @@ fun InicioContent(
                             OutlinedTextField(
                                 value = uiState.searchQuery,
                                 onValueChange = onSearchQueryChange,
-                                label = { Text("Buscar", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold) },
+                                label = { Text("Buscar", color = Color.Black, fontWeight = FontWeight.SemiBold) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Rounded.Search,
@@ -311,12 +312,12 @@ fun InicioContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    focusedTextColor = Color.Black,
+                                    unfocusedTextColor = Color.Black,
                                     focusedBorderColor = PrimaryDarkGreen,
                                     unfocusedBorderColor = PrimaryDarkGreen,
                                     focusedLabelColor = PrimaryDarkGreen,
-                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
+                                    unfocusedLabelColor = Color.Black
                                 )
                             )
                         }
@@ -387,7 +388,7 @@ private fun HistorialTab(
                 text = "No se encontraron registros de pre-chequeos.",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = Color.Black
             )
         }
     } else {
@@ -437,19 +438,19 @@ private fun PreChequeoCard(
             text = "Buzo: ${preChequeo.buzo.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
         Text(
             text = "Supervisor: ${preChequeo.supervisor.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
         Text(
             text = "Centro: ${preChequeo.centro.nombre}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Color.Black
         )
     }
 }

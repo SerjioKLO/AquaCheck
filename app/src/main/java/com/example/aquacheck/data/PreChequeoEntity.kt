@@ -5,9 +5,14 @@ import androidx.room.PrimaryKey
 import com.example.aquacheck.model.Buzo
 import com.example.aquacheck.model.Centro
 import com.example.aquacheck.model.DatosSalud
+import com.example.aquacheck.model.EvidenciaItem
 import com.example.aquacheck.model.MockData
 import com.example.aquacheck.model.PreChequeo
 import com.example.aquacheck.model.Supervisor
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 @Entity(tableName = "prechequeos")
 data class PreChequeoEntity(
@@ -32,9 +37,11 @@ data class PreChequeoEntity(
     val horasUltimoAlcohol: Int = 0,
     val tieneCongestionNasal: Boolean = false,
     val tomaMedicamentosNuevos: Boolean = false,
-    val estadoPsicologicoCalmo: Boolean = true
+    val estadoPsicologicoCalmo: Boolean = true,
+    val evidenciasJson: String = ""
 ) {
     fun toDomain(): PreChequeo {
+        val evidenciasList = toEvidenciasList(evidenciasJson)
         return PreChequeo(
             id = id,
             buzo = Buzo(id = buzoId, nombre = buzoNombre, certificacion = buzoCertificacion),
@@ -42,7 +49,7 @@ data class PreChequeoEntity(
             centro = Centro(id = centroId, nombre = centroNombre, ubicacion = centroUbicacion),
             fecha = fecha,
             items = MockData.defaultChecklistItems,
-            evidencias = emptyList(),
+            evidencias = evidenciasList,
             resultado = resultado,
             observaciones = observaciones,
             frecuenciaCardiaca = frecuenciaCardiaca,
@@ -72,6 +79,29 @@ data class PreChequeoEntity(
     }
 
     companion object {
+        private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        private val listType = Types.newParameterizedType(List::class.java, EvidenciaDto::class.java)
+        private val adapter = moshi.adapter<List<EvidenciaDto>>(listType)
+
+        fun toEvidenciasList(json: String): List<EvidenciaItem> {
+            if (json.isBlank()) return emptyList()
+            return try {
+                val dtos = adapter.fromJson(json)
+                dtos?.map { EvidenciaItem(id = it.id, titulo = it.titulo, imagePath = it.imagePath) } ?: emptyList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        }
+
+        fun fromEvidenciasList(list: List<EvidenciaItem>): String {
+            return try {
+                val dtos = list.map { EvidenciaDto(id = it.id, titulo = it.titulo, imagePath = it.imagePath) }
+                adapter.toJson(dtos)
+            } catch (e: Exception) {
+                ""
+            }
+        }
+
         fun fromDomain(preChequeo: PreChequeo): PreChequeoEntity {
             return PreChequeoEntity(
                 id = preChequeo.id,
@@ -94,8 +124,16 @@ data class PreChequeoEntity(
                 horasUltimoAlcohol = preChequeo.horasUltimoAlcohol,
                 tieneCongestionNasal = preChequeo.tieneCongestionNasal,
                 tomaMedicamentosNuevos = preChequeo.tomaMedicamentosNuevos,
-                estadoPsicologicoCalmo = preChequeo.estadoPsicologicoCalmo
+                estadoPsicologicoCalmo = preChequeo.estadoPsicologicoCalmo,
+                evidenciasJson = fromEvidenciasList(preChequeo.evidencias)
             )
         }
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class EvidenciaDto(
+    val id: String,
+    val titulo: String,
+    val imagePath: String?
+)

@@ -49,7 +49,6 @@ fun SplashScreen(
     var progress by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(Unit) {
-        // Animate progress bar over ~1.8 seconds
         for (i in 1..100) {
             delay(18)
             progress = i / 100f
@@ -102,12 +101,11 @@ fun SplashScreen(
             contentAlignment = Alignment.BottomCenter
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f),
+                modifier = Modifier.fillMaxWidth(0.6f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LinearProgressIndicator(
-                    progress = { progress },
+                    progress = progress,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(6.dp)
