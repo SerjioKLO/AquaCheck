@@ -331,12 +331,13 @@ fun DetalleContent(
                     Icon(
                         imageVector = Icons.Rounded.Delete,
                         contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 6.dp)
                     )
                     Text(
-                        text = "Eliminar Registro de Pre-Chequeo",
+                        text = "Eliminar registro de evaluación",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 14.sp,
+                        maxLines = 1
                     )
                 }
 
